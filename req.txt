@@ -3,31 +3,21 @@ MUST HAVE:
 -hra poběží do smrti hráče
 -turned based rpg combat
 -menu
+-mapu, po které se bude hráč pohybovat
 
 SHOULD HAVE:
--mapu, po které se bude hráč pohybovat
 -na začátku se hry se zadá nickname
--na konci se zobrazí nickname se skorem(podle statů monstra) 
+-na konci se zobrazí nickname se skorem(podle statů monstra)
+-Bossové
+-itemy
+-levely -exp
 
 NICE TO HAVE:
--
+-ASCII
+-biomy
+-obchodník
+-více postav
+-random eventy
 
 
 
-REQUIREMENTS:
--
-
-
-QUESTIONS:
--Má tam být generace?
--Budou tam itemy? - jestli jo, bude existovat nějaký obchodník?
--Boss monstra?
--Můžem využít ASCII?
--Jak dlouho máme?
--Levely?
--Biomy? - Kolik?
--nastavitelná obtížnost?
--více postav?
--Skilly, které využívají nějakou energii?
--boj proti více monster najednou?
--random ecountery a rozhovor?
