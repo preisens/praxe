@@ -6,8 +6,7 @@ int main()
     int running=1;
 
     Start();
-    printf("Start\n");
-
+    
 
     while(running)
     {
