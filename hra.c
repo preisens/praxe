@@ -1,6 +1,6 @@
 #include "hra.h"
 char nickname[20];
-struct
+struct stats
 {
     int hp;
     int maxhp;
@@ -9,14 +9,16 @@ struct
     int dmg;
     int lvl;
     int exp;
+    int maxexp;
     int gold;
     int armor;
-    int weapon;
+    int weapondmg;
 } self, monster;
 
 void Start()
 {
     Welcome();
+    StartPlayer();
 }
 void Events()
 {
@@ -24,6 +26,12 @@ void Events()
 
 void Update()
 {
+    if(self.exp >= self.maxexp)
+    {
+        self.lvl++;
+        self.exp = 0;
+        self.maxexp += 100;
+    }
 }
 
 void Render()
@@ -48,12 +56,13 @@ void StartPlayer()
     self.hp = 100;
     self.maxmana = 100;
     self.mana = 100;
-    self.dmg = rand() % 10 + 1;
+    self.dmg = rand() % 21 + 20;
     self.lvl = 1;
     self.exp = 0;
+    self.maxexp = 100;
     self.gold = 0;
     self.armor = 0;
-    self.weapon = 0;
+    self.weapondmg = 0;
 }
 void Menu()
 {
@@ -74,6 +83,18 @@ void Menu()
     break;
     case 2:
     {
+        printf("Your HP: %d/%d\n", self.hp, self.maxhp);
+        printf("Your armor: %d\n", self.armor);
+        printf("Your mana: %d/%d\n", self.mana, self.maxmana);
+        printf("Your damage: %d\n", self.dmg + self.weapondmg);
+        printf("Your level: %d\n", self.lvl);
+        printf("Your exp: %d/%d\n", self.exp, self.maxexp);
+        printf("Your gold: %d\n", self.gold);
+        system("pause");
+        system("cls");
+        printf("Items:\n");
+        system("pause");
+        system("cls");
     }
     break;
     case 3:
@@ -100,7 +121,6 @@ void Menu()
 }
 void Combat()
 {
-    StartPlayer();
     srand(time(NULL));
     FILE *f;
     // open a random .txt file from the folder enemies
@@ -110,15 +130,31 @@ void Combat()
     monster.dmg = rand() % 10 + 1;
     monster.gold = rand() % 100 + 1;
     monster.exp = rand() % 100 + 1;
+    printf("--------------------------------------------------------\n");
+    if (enemy == 1)
+    {
+        printf("You have encountered a goblin!\n");
+    }
+    else if (enemy == 2)
+    {
+        printf("You have encountered a golem!\n");
+    }
+    else if (enemy == 3)
+    {
+        printf("You have encountered a slime!\n");
+    }
+    else if (enemy == 4)
+    {
+         printf("You have encountered a cyclops!\n");
+    }
+    printf("--------------------------------------------------------\n");
     while (monster.hp > 0)
     {
-        printf("--------------------------------------------------------\n");
         switch (enemy)
         {
         case 1:
         {
             f = fopen("enemies/goblin.txt", "r");
-            printf("You have encountered a goblin!\n");
             // open the file and print it to the console
             char c;
             while ((c = fgetc(f)) != EOF)
@@ -131,7 +167,6 @@ void Combat()
         case 2:
         {
             f = fopen("enemies/golem.txt", "r");
-            printf("You have encountered a golem!\n");
             // open the file and print it to the console
             char c;
             while ((c = fgetc(f)) != EOF)
@@ -144,7 +179,6 @@ void Combat()
         case 3:
         {
             f = fopen("enemies/slime.txt", "r");
-            printf("You have encountered a slime!\n");
             // open the file and print it to the console
             char c;
             while ((c = fgetc(f)) != EOF)
@@ -157,7 +191,6 @@ void Combat()
         case 4:
         {
             f = fopen("enemies/cyclops.txt", "r");
-            printf("You have encountered a cyclops!\n");
             // open the file and print it to the console
             char c;
             while ((c = fgetc(f)) != EOF)
@@ -169,7 +202,7 @@ void Combat()
         break;
         }
         printf("--------------------------------------------------------\n");
-        printf("Enemy HP: %d/%d\n", monster.hp, monster.maxhp);
+        printf("        Enemy HP: %d/%d\n", monster.hp, monster.maxhp);
         printf("--------------------------------------------------------\n");
         printf("What do you want to do?\n");
         printf("1......... Attack\n");
@@ -185,8 +218,8 @@ void Combat()
         case 1:
         {
             printf("You chose to attack!\n");
-            printf("You dealt %d damage to the monster!\n", self.dmg + self.weapon);
-            monster.hp -= self.dmg + self.weapon;
+            printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg);
+            monster.hp -= self.dmg + self.weapondmg;
         }
         break;
         case 2:
@@ -202,24 +235,24 @@ void Combat()
             case 1:
             {
                 printf("You used Fireball!\n");
-                printf("You dealt %d damage to the monster!\n", self.dmg + self.weapon + 5);
-                monster.hp -= self.dmg + self.weapon + 5;
+                printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg + 5);
+                monster.hp -= self.dmg + self.weapondmg + 5;
                 self.mana -= 10;
             }
             break;
             case 2:
             {
                 printf("You used Icebolt!\n");
-                printf("You dealt %d damage to the monster!\n", self.dmg + self.weapon + 10);
-                monster.hp -= self.dmg + self.weapon + 10;
+                printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg + 10);
+                monster.hp -= self.dmg + self.weapondmg + 10;
                 self.mana -= 15;
             }
             break;
             case 3:
             {
                 printf("You used Lightning!\n");
-                printf("You dealt %d damage to the monster!\n", self.dmg + self.weapon + 15);
-                monster.hp -= self.dmg + self.weapon + 15;
+                printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg + 15);
+                monster.hp -= self.dmg + self.weapondmg + 15;
                 self.mana -= 20;
             }
             break;
@@ -244,6 +277,7 @@ void Combat()
             if (rand() % 2 == 0)
             {
                 printf("You have successfully ran away!\n");
+                system("pause");
                 return;
             }
             else
