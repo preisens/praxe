@@ -16,5 +16,6 @@ void Welcome();
 void Menu();
 void StartPlayer();
 void Combat();
+void levelUp();
 
 

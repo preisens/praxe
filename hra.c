@@ -26,12 +26,7 @@ void Events()
 
 void Update()
 {
-    if(self.exp >= self.maxexp)
-    {
-        self.lvl++;
-        self.exp = 0;
-        self.maxexp += 100;
-    }
+    levelUp();
 }
 
 void Render()
@@ -55,7 +50,7 @@ void StartPlayer()
     self.maxhp = 100;
     self.hp = 100;
     self.maxmana = 100;
-    self.mana = 100;
+    self.mana = 20;
     self.dmg = rand() % 21 + 20;
     self.lvl = 1;
     self.exp = 0;
@@ -99,12 +94,11 @@ void Menu()
     break;
     case 3:
     {
-        
+
         // Výpis vybraného řádku
         printf("Welcome to the shop!\n");
         printf("What do you want to buy?\n");
         system("pause");
-    
     }
     break;
     case 4:
@@ -130,7 +124,7 @@ void Combat()
     monster.dmg = rand() % 10 + 1;
     monster.gold = rand() % 100 + 1;
     monster.exp = rand() % 100 + 1;
-    printf("--------------------------------------------------------\n");
+    printf("-----------------------------------------------------------------\n");
     if (enemy == 1)
     {
         printf("You have encountered a goblin!\n");
@@ -145,9 +139,9 @@ void Combat()
     }
     else if (enemy == 4)
     {
-         printf("You have encountered a cyclops!\n");
+        printf("You have encountered a cyclops!\n");
     }
-    printf("--------------------------------------------------------\n");
+    printf("-----------------------------------------------------------------\n");
     while (monster.hp > 0)
     {
         switch (enemy)
@@ -197,10 +191,15 @@ void Combat()
         }
         break;
         }
-        printf("--------------------------------------------------------\n");
-        printf("        Enemy HP: %d/%d\n", monster.hp, monster.maxhp);
-        printf("--------------------------------------------------------\n");
-        printf("What do you want to do?\n");
+        printf("-----------------------------------------------------------------\n");
+        printf("\t\t\tENEMY STATS\t\t\t\t|\n");
+        printf("-----------------------------------------------------------------\n");
+        printf("\tHP: %d/%d\n", monster.hp, monster.maxhp);
+        printf("-----------------------------------------------------------------\n");
+        printf("\t\t\tYOUR STATS\t\t\t\t|\n");
+        printf("-----------------------------------------------------------------\n");
+        printf("\tHP: %d/%d\tMANA: %d/%d\tARMOR: %d\n", self.hp, self.maxhp, self.mana, self.maxmana, self.armor);
+        printf("\nWhat do you want to do?\n");
         printf("1......... Attack\n");
         printf("2......... Skills\n");
         printf("3......... Defend\n");
@@ -217,6 +216,9 @@ void Combat()
             printf("You chose to attack!\n");
             printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg);
             monster.hp -= self.dmg + self.weapondmg;
+            system("pause");
+            printf("\033[3A");
+            printf("\033[0J");
         }
         break;
         case 2:
@@ -233,6 +235,12 @@ void Combat()
             {
             case 1:
             {
+                if (self.mana < 10)
+                {
+                   printf("The skill didn't work!\n");
+                    printf("You don't have enough mana!\n");
+                    break;
+                }
                 printf("You used Fireball!\n");
                 printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg + 5);
                 monster.hp -= self.dmg + self.weapondmg + 5;
@@ -241,6 +249,12 @@ void Combat()
             break;
             case 2:
             {
+                if (self.mana < 15)
+                {
+                    printf("The skill didn't work!\n");
+                    printf("You don't have enough mana!\n");
+                    break;
+                }
                 printf("You used Icebolt!\n");
                 printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg + 10);
                 monster.hp -= self.dmg + self.weapondmg + 10;
@@ -249,6 +263,12 @@ void Combat()
             break;
             case 3:
             {
+                if (self.mana < 20)
+                {
+                    printf("The skill didn't work!\n");
+                    printf("You don't have enough mana!\n");
+                    break;
+                }
                 printf("You used Lightning!\n");
                 printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg + 15);
                 monster.hp -= self.dmg + self.weapondmg + 15;
@@ -256,7 +276,13 @@ void Combat()
             }
             break;
             }
-            printf("Your mana: %d/%d\n", self.mana, self.maxmana);
+            if (self.mana < 0)
+            {
+                self.mana = 0;
+            }
+            system("pause");
+            printf("\033[3A");
+            printf("\033[0J");
         }
         break;
         case 3:
@@ -264,6 +290,7 @@ void Combat()
             printf("You chose to defend!\n");
             self.armor += rand() % 21 + 10;
             printf("You gained %d armor!\n", self.armor);
+            system("pause");
             printf("\033[3A");
             printf("\033[0J");
         }
@@ -285,12 +312,12 @@ void Combat()
             {
                 printf("You failed to run away!\n");
             }
-            printf("\033[4A");
+            system("pause");
+            printf("\033[3A");
             printf("\033[0J");
         }
         break;
         }
-        system("pause");
         if (monster.hp > 0)
         {
             printf("The monster attacked you!\n");
@@ -311,22 +338,17 @@ void Combat()
             {
                 self.armor = 0;
             }
-            printf("\033[4A");
+            system("pause");
+            printf("\033[3A");
             printf("\033[0J");
         }
-
-        printf("Your HP: %d/%d\n", self.hp, self.maxhp);
-        printf("Your armor: %d\n", self.armor);
-        printf("Your mana: %d/%d\n", self.mana, self.maxmana);
-        system("pause");
-        printf("\033[4A");
-        printf("\033[0J");
         if (self.hp <= 0)
         {
             printf("You died!\n");
             printf("Game over!\n");
             exit(0);
         }
+        system("cls");
     }
     fclose(f);
     printf("You have defeated the monster!\n");
@@ -334,4 +356,23 @@ void Combat()
     self.gold += monster.gold;
     self.exp += monster.exp;
     system("pause");
+    system("cls");
+}
+void levelUp()
+{
+    if (self.exp >= self.maxexp)
+    {
+        self.lvl++;
+        self.exp = 0;
+        self.maxexp += 100;
+        self.maxhp += 10;
+        self.maxmana += 10;
+        self.dmg += 5;
+        printf("You leveled up!\n");
+        printf("You are now level %d!\n", self.lvl);
+        printf("You gained 10 max HP!\n");
+        printf("You gained 10 max mana!\n");
+        printf("You gained 5 damage!\n");
+        system("pause");
+    }
 }
