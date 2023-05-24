@@ -10,9 +10,10 @@ int main()
 
     while(running)
     {
+        Render();
         Events();
         Update();
-        Render();
+        
     }
 
 
