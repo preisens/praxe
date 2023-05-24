@@ -139,25 +139,25 @@ void MoveControl()
 
 void MoveUpdate()
 {
-    if (Controller == 'w')
+    if (Controller == 'w' && x-1>=0)
     {
         map[y][x][1] = 0;
         x = x - 1;
         map[y][x][1] = 1;
     }
-    else if (Controller == 's')
+    else if (Controller == 's' && x+1<=19)
     {
         map[y][x][1] = 0;
         x = x + 1;
         map[y][x][1] = 1;
     }
-    else if (Controller == 'a')
+    else if (Controller == 'a' && y-1>=0)
     {
         map[y][x][1] = 0;
         y = y - 1;
         map[y][x][1] = 1;
     }
-    else if (Controller == 'd')
+    else if (Controller == 'd' && y+1<=19)
     {
         map[y][x][1] = 0;
         y = y + 1;
