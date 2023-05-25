@@ -3,9 +3,10 @@
 #define SIZE_Y 30
 #define SIZE_X 60
 
+int Encounter = 0;
 int i,j,k;
 int map [SIZE_Y][SIZE_X][2];
-char Controller;
+char Controller='V';
 int x=10;
 int y=10;
 
@@ -29,11 +30,11 @@ struct stats
 
 void Start()
 {
-    Welcome();
     x=10;
     y=10;
     Generate_map();
     StartPlayer();
+    Welcome();
 }
 
 void Render()
@@ -58,7 +59,9 @@ void Welcome()
 {
     printf("Welcome to the game!\n");
     printf("What is your nickname?\n");
+
     scanf("%s", nickname);
+
     system("cls");
     printf("Hello %s,\n", nickname);
     Sleep(1000);
@@ -455,6 +458,17 @@ void Generate_map()
 
 void Print_map()
 {
+
+    if(Encounter>=1 && Encounter<=15)
+    {
+        system("cls");
+        printf("Monster is attacking ! \n !");
+        Sleep(3000);
+        system("cls");
+        Combat();
+
+    }
+
     for (i = 0; i < SIZE_Y; i++)
     {
         for (j = 0; j < SIZE_X; j++)
@@ -523,6 +537,9 @@ void MoveUpdate()
         x = x + 1;
         map[y][x][1] = 1;
     }
+
+    Encounter=rand()%(100-1+1)+1;
+
 }
 
 
