@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "hra.h"
 
 int main()
@@ -11,27 +10,10 @@ int main()
 
     Welcome();
 
-    Menu();
-
     while(1)
     {
-        Print_map();
-        MoveControl();
-        MoveUpdate();
-        system("cls");
-        Encounter=rand()%(100-1+1)+1;
-        if(Encounter==-5)
-        {
-            Combat();
-        }
-
+         Menu();
     }
-
-
-    
-
-
-
 
     return 0;
 }

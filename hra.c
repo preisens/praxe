@@ -3,7 +3,7 @@
 #define SIZE_Y 30
 #define SIZE_X 60
 
-int Encounter = 0;
+int Ecounter=0;
 int i,j,k;
 int map [SIZE_Y][SIZE_X][2];
 char Controller='V';
@@ -505,7 +505,15 @@ void MoveUpdate()
         x = x + 1;
         map[y][x][1] = 1;
     }
-
+    srand(time(NULL));
+    Ecounter = rand() % 100 + 1;
+    if (Ecounter>=1 && Ecounter<=50)
+    {
+        printf("a monster attacked you!\n");
+        Sleep(1000);
+        system("cls");
+        Combat();
+    }
 
 }
 
