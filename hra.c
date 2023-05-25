@@ -343,7 +343,7 @@ void Combat()
             printf("\033[2A");
             printf("\033[0J");
         }
-       
+
         system("cls");
     }
     if(self.hp>0)
@@ -396,12 +396,12 @@ void Generate_map()
     int distanceY = 0;
     int distanceX = 0;
     int biome_id = 0;
+    int flag=0;
 
     srand(time(NULL));
 
-    int i, j, k; // Declare loop variables
+    int i, j, k;
 
-    // Initialize the map
     for (i = 0; i < SIZE_Y; i++)
     {
         for (j = 0; j < SIZE_X; j++)
@@ -411,7 +411,28 @@ void Generate_map()
         }
     }
 
-    map[10][10][1] = 1;
+    for(i=0;i<SIZE_Y;i++)
+    {
+        for(j=0;j<SIZE_X;j++)
+        {
+            if(map[i][j][0]!=3)
+            {
+                x=j;
+                y=i;
+                map[y][x][1]=1;
+                flag=1;
+                break;
+
+            }
+
+        }
+
+            if(flag==1)
+            {
+                break;
+            }
+
+    }
 
     for (i = 0; i < 30; i++)
     {
@@ -443,23 +464,23 @@ void Print_map()
         {
             if (map[i][j][0] == 1 && map[i][j][1] == 0)
             {
-                printf("- ");
+                printf("\033[0;36m- ");
             }
             else if (map[i][j][0] == 2 && map[i][j][1] == 0)
             {
-                printf("T ");
+                printf("\033[0;32mT ");
             }
             else if (map[i][j][0] == 3 && map[i][j][1] == 0)
             {
-                printf("o ");
+                printf("\033[0;34mo ");
             }
             else if (map[i][j][0] == 4 && map[i][j][1] == 0)
             {
-                printf("X ");
+                printf("\033[0;37mX ");
             }
             else if (map[i][j][1] == 1)
             {
-                printf("$ ");
+                printf("\033[0;31m$ ");
             }
         }
 
@@ -472,34 +493,34 @@ void MoveControl()
 {
     do
     {
-    
+
     Controller = getch();
-   
+
 
     }while(Controller!='w' && Controller!='a' && Controller!='s' && Controller!='d');
 }
 
 void MoveUpdate()
 {
-    if (Controller == 'w' && y-1>=0)
+    if (Controller == 'w' && y-1>=0 && map[y-1][x][0]!=3)
     {
         map[y][x][1] = 0;
         y = y - 1;
         map[y][x][1] = 1;
     }
-    else if (Controller == 's' && y+1<=SIZE_Y-1)
+    else if (Controller == 's' && y+1<=SIZE_Y-1 && map[y+1][x][0]!=3)
     {
         map[y][x][1] = 0;
         y = y + 1;
         map[y][x][1] = 1;
     }
-    else if (Controller == 'a' && x-1>=0)
+    else if (Controller == 'a' && x-1>=0 && map[y][x-1][0]!=3)
     {
         map[y][x][1] = 0;
         x = x - 1;
         map[y][x][1] = 1;
     }
-    else if (Controller == 'd' && x+1<=SIZE_X-1)
+    else if (Controller == 'd' && x+1<=SIZE_X-1 && map[y][x+1][0]!=3)
     {
         map[y][x][1] = 0;
         x = x + 1;
