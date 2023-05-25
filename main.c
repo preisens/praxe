@@ -3,18 +3,34 @@
 
 int main()
 {
-    int running=1;
+    int Encounter=0;
 
-    Start();
+    Generate_map();
+
+    StartPlayer();
+
+    Welcome();
+
+    Menu();
+
+    while(1)
+    {
+        Print_map();
+        MoveControl();
+        MoveUpdate();
+        system("cls");
+        Encounter=rand()%(100-1+1)+1;
+        if(Encounter==-5)
+        {
+            Combat();
+        }
+
+    }
+
+
     
 
-    while(running)
-    {
-        Render();
-        Events();
-        Update();
-        
-    }
+
 
 
     return 0;

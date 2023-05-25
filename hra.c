@@ -28,32 +28,6 @@ struct stats
     int weapondmg;
 } self, monster;
 
-void Start()
-{
-    x=10;
-    y=10;
-    Generate_map();
-    StartPlayer();
-    Welcome();
-}
-
-void Render()
-{
-    Menu();
-}
-
-void Events()
-{
-    
-}
-
-void Update()
-{
-    
-
-    levelUp();
-}
-
 
 void Welcome()
 {
@@ -418,12 +392,16 @@ void End()
 }
 void Generate_map()
 {
-    int biome_size=0;
-    int distanceY=0;
-    int distanceX=0;
-    int biome_id=0;
+    int biome_size = 0;
+    int distanceY = 0;
+    int distanceX = 0;
+    int biome_id = 0;
+
     srand(time(NULL));
 
+    int i, j, k; // Declare loop variables
+
+    // Initialize the map
     for (i = 0; i < SIZE_Y; i++)
     {
         for (j = 0; j < SIZE_X; j++)
@@ -433,41 +411,31 @@ void Generate_map()
         }
     }
 
-    map[10][10][1]=1;
+    map[10][10][1] = 1;
 
-
-    for(i=0;i<30;i++)
+    for (i = 0; i < 30; i++)
     {
-        distanceX=rand()%(SIZE_X-1+1)+1;
-        distanceY=rand()%(SIZE_Y-1+1)+1;
-        biome_id=rand()%(4-2+1)+2;
-        biome_size=rand()%(10-2+1)+2;
+        distanceX = rand() % (SIZE_X - 1) + 1;
+        distanceY = rand() % (SIZE_Y - 1) + 1;
+        biome_id = rand() % (4 - 2 + 1) + 2;
+        biome_size = rand() % (10 - 2 + 1) + 2;
 
-        for(j=0;j<biome_size;j++)
+        for (j = 0; j < biome_size; j++)
         {
-            for(k=0;k<biome_size;k++)
+            for (k = 0; k < biome_size; k++)
             {
-                map[distanceY+j][distanceX+k][0]=biome_id;
+                if (distanceY + j < SIZE_Y && distanceX + k < SIZE_X)
+                {
+                    map[distanceY + j][distanceX + k][0] = biome_id;
+                }
             }
-        }      
+        }
     }
-    
-
 }
 
 
 void Print_map()
 {
-
-    if(Encounter>=1 && Encounter<=15)
-    {
-        system("cls");
-        printf("Monster is attacking ! \n !");
-        Sleep(3000);
-        system("cls");
-        Combat();
-
-    }
 
     for (i = 0; i < SIZE_Y; i++)
     {
@@ -538,7 +506,6 @@ void MoveUpdate()
         map[y][x][1] = 1;
     }
 
-    Encounter=rand()%(100-1+1)+1;
 
 }
 
