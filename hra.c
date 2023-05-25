@@ -80,7 +80,7 @@ void Menu()
     FontSize(30);
     printf("What do you want to do?\n");
     printf("1......... Explore\n");
-    printf("2......... Inventory\n");
+    printf("2......... Status/Inventory\n");
     printf("3......... Shop\n");
     printf("4......... Exit\n");
     char choice = getch();
@@ -425,6 +425,7 @@ void End()
 {
     if (self.hp <= 0)
     {
+        FontSize(30);
         printf("It's Game Over for %s!\n", nickname);
         printf("You reached level %d!\n", self.lvl);
         printf("You gained a total of %d exp and %d gold!\n", self.totalexp, self.totalgold);

@@ -1,6 +1,6 @@
 #include "hra.h"
 
-int main()
+void main()
 {   
     HWND console = GetConsoleWindow();
     SetWindowLong(console, GWL_STYLE, GetWindowLong(console, GWL_STYLE) & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX);
@@ -17,6 +17,4 @@ int main()
     {   
         Menu();
     }
-
-    return 0;
 }
