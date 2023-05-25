@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <time.h>
 #include <unistd.h>
+#include <conio.h>
 
 void Start();
 

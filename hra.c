@@ -1,7 +1,10 @@
 #include "hra.h"
 
+#define SIZE_Y 30
+#define SIZE_X 60
+
 int i,j,k;
-int map [20][20][2];
+int map [SIZE_Y][SIZE_X][2];
 char Controller;
 int x=10;
 int y=10;
@@ -46,9 +49,9 @@ void Generate_map()
 
     srand(time(NULL));
 
-    for (i = 0; i < 20; i++)
+    for (i = 0; i < SIZE_Y; i++)
     {
-        for (j = 0; j < 20; j++)
+        for (j = 0; j < SIZE_X; j++)
         {
             map[i][j][0] = 1;
             map[i][j][1] = 0;
@@ -58,12 +61,12 @@ void Generate_map()
     map[10][10][1]=1;
 
 
-    for(i=0;i<15;i++)
+    for(i=0;i<30;i++)
     {
-        distanceX=rand()%(20-1+1)+1;
-        distanceY=rand()%(20-1+1)+1;
+        distanceX=rand()%(SIZE_X-1+1)+1;
+        distanceY=rand()%(SIZE_Y-1+1)+1;
         biome_id=rand()%(4-2+1)+2;
-        biome_size=rand()%(5-2+1)+2;
+        biome_size=rand()%(10-2+1)+2;
 
         for(j=0;j<biome_size;j++)
         {
@@ -80,27 +83,27 @@ void Generate_map()
 
 void Print_map()
 {
-    for (i = 0; i < 20; i++)
+    for (i = 0; i < SIZE_Y; i++)
     {
-        for (j = 0; j < 20; j++)
+        for (j = 0; j < SIZE_X; j++)
         {
-            if (map[j][i][0] == 1 && map[j][i][1] == 0)
+            if (map[i][j][0] == 1 && map[i][j][1] == 0)
             {
                 printf("- ");
             }
-            else if (map[j][i][0] == 2 && map[j][i][1] == 0)
+            else if (map[i][j][0] == 2 && map[i][j][1] == 0)
             {
                 printf("T ");
             }
-            else if (map[j][i][0] == 3 && map[j][i][1] == 0)
+            else if (map[i][j][0] == 3 && map[i][j][1] == 0)
             {
-                printf("? ");
+                printf("o ");
             }
-            else if (map[j][i][0] == 4 && map[j][i][1] == 0)
+            else if (map[i][j][0] == 4 && map[i][j][1] == 0)
             {
-                printf("! ");
+                printf("X ");
             }
-            else if (map[j][i][1] == 1)
+            else if (map[i][j][1] == 1)
             {
                 printf("$ ");
             }
@@ -116,51 +119,36 @@ void MoveControl()
     do
     {
     
-    scanf(" %c",&Controller);
-    if(Controller=='w')
-    {
-
-    }
-    else if(Controller=='a')
-    {
-        
-    }
-    else if(Controller=='s')
-    {
-        
-    }
-    else if(Controller=='d')
-    {
-        
-    }
+    Controller = getch();
+   
 
     }while(Controller!='w' && Controller!='a' && Controller!='s' && Controller!='d');
 }
 
 void MoveUpdate()
 {
-    if (Controller == 'w' && x-1>=0)
-    {
-        map[y][x][1] = 0;
-        x = x - 1;
-        map[y][x][1] = 1;
-    }
-    else if (Controller == 's' && x+1<=19)
-    {
-        map[y][x][1] = 0;
-        x = x + 1;
-        map[y][x][1] = 1;
-    }
-    else if (Controller == 'a' && y-1>=0)
+    if (Controller == 'w' && y-1>=0)
     {
         map[y][x][1] = 0;
         y = y - 1;
         map[y][x][1] = 1;
     }
-    else if (Controller == 'd' && y+1<=19)
+    else if (Controller == 's' && y+1<=SIZE_Y-1)
     {
         map[y][x][1] = 0;
         y = y + 1;
+        map[y][x][1] = 1;
+    }
+    else if (Controller == 'a' && x-1>=0)
+    {
+        map[y][x][1] = 0;
+        x = x - 1;
+        map[y][x][1] = 1;
+    }
+    else if (Controller == 'd' && x+1<=SIZE_X-1)
+    {
+        map[y][x][1] = 0;
+        x = x + 1;
         map[y][x][1] = 1;
     }
 }
