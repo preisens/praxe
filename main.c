@@ -1,8 +1,11 @@
 #include "hra.h"
 
 int main()
-{
-    int Encounter=0;
+{   
+    HWND console = GetConsoleWindow();
+    SetWindowLong(console, GWL_STYLE, GetWindowLong(console, GWL_STYLE) & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX);
+    ShowWindow(console, SW_MAXIMIZE);
+    
 
     Generate_map();
 
@@ -11,8 +14,8 @@ int main()
     Welcome();
 
     while(1)
-    {
-         Menu();
+    {   
+        Menu();
     }
 
     return 0;

@@ -3,12 +3,12 @@
 #define SIZE_Y 30
 #define SIZE_X 60
 
-int Ecounter=0;
-int i,j,k;
-int map [SIZE_Y][SIZE_X][2];
-char Controller='V';
-int x=10;
-int y=10;
+int Ecounter = 0;
+int i, j, k;
+int map[SIZE_Y][SIZE_X][2];
+char Controller = 'V';
+int x = 10;
+int y = 10;
 
 char nickname[20];
 struct stats
@@ -28,10 +28,26 @@ struct stats
     int weapondmg;
 } self, monster;
 
-
+void FontSize(int size)
+{
+    CONSOLE_FONT_INFOEX fontInfo;
+    fontInfo.cbSize = sizeof(CONSOLE_FONT_INFOEX);
+    GetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &fontInfo);
+    fontInfo.dwFontSize.Y = size; // Set the desired font height
+    SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &fontInfo);
+}
 void Welcome()
 {
-    printf("Welcome to the game!\n");
+    FontSize(30);
+    FILE *f = fopen("title.txt", "r");
+    char c;
+    while ((c = fgetc(f)) != EOF)
+    {
+        printf("%c", c);
+    }
+    fclose(f);
+    Sleep(2000);
+    printf("\n\nWelcome to the game!\n");
     printf("What is your nickname?\n");
 
     scanf("%s", nickname);
@@ -59,7 +75,9 @@ void StartPlayer()
 }
 void Menu()
 {
+    Controller = 'V';
     system("cls");
+    FontSize(30);
     printf("What do you want to do?\n");
     printf("1......... Explore\n");
     printf("2......... Inventory\n");
@@ -71,12 +89,14 @@ void Menu()
     {
     case '1':
     {
-        while(1)
+
+        while (Controller!='q')
         {
-        Print_map();
-        MoveControl();
-        MoveUpdate();
-        system("cls");
+            levelUp();
+            Print_map();
+            MoveControl();
+            MoveUpdate();
+            system("cls");
         }
     }
     break;
@@ -118,6 +138,7 @@ void Menu()
 }
 void Combat()
 {
+    FontSize(20);
     srand(time(NULL));
     FILE *f;
     // open a random .txt file from the folder enemies
@@ -127,7 +148,6 @@ void Combat()
     monster.dmg = rand() % 31 + 20;
     monster.gold = rand() % 100 + 1;
     monster.exp = rand() % 100 + 1;
-    printf("-----------------------------------------------------------------\n");
     if (enemy == 1)
     {
         printf("You have encountered a goblin!\n");
@@ -144,7 +164,9 @@ void Combat()
     {
         printf("You have encountered a cyclops!\n");
     }
-    printf("-----------------------------------------------------------------\n");
+    Sleep(1000);
+    system("pause");
+    system("cls");
     while (monster.hp > 0 && self.hp > 0)
     {
         switch (enemy)
@@ -174,12 +196,20 @@ void Combat()
         case 3:
         {
             f = fopen("enemies/slime.txt", "r");
-            // open the file and print it to the console
             char c;
             while ((c = fgetc(f)) != EOF)
             {
+                if(c!='@')
+                {
+                    printf("\033[0;32m");
+                }
+                else
+                {
+                    printf("\033[0m");
+                }
                 printf("%c", c);
             }
+             printf("\033[0m");
         }
         break;
         case 4:
@@ -346,22 +376,24 @@ void Combat()
 
         system("cls");
     }
-    if(self.hp>0)
+    if (self.hp > 0)
     {
-    printf("You have defeated the monster!\n");
-    printf("You gained %d gold and %d exp!\n", monster.gold, monster.exp);
-    self.gold += monster.gold;
-    self.exp += monster.exp;
-    self.totalgold += self.gold;
-    self.totalexp += self.exp;
+        printf("You have defeated the monster!\n");
+        printf("You gained %d gold and %d exp!\n", monster.gold, monster.exp);
+        self.gold += monster.gold;
+        self.exp += monster.exp;
+        self.totalgold += self.gold;
+        self.totalexp += self.exp;
     }
-    if (f != NULL)  fclose(f);
+    if (f != NULL)
+        fclose(f);
     End();
     system("pause");
     system("cls");
 }
 void levelUp()
 {
+    FontSize(30);
     if (self.exp >= self.maxexp)
     {
         self.lvl++;
@@ -376,7 +408,18 @@ void levelUp()
         printf("You gained 10 max mana!\n");
         printf("You gained 5 damage!\n");
         system("pause");
+        system("cls");
     }
+}
+void CreateScore()
+{
+    char filepath[100];
+    sprintf(filepath, "score/%s.txt", nickname);
+    FILE *file = fopen(filepath, "w");
+    fprintf(file, "Level: %d\n", self.lvl);
+    fprintf(file, "Total Experience: %d\n", self.totalexp);
+    fprintf(file, "Total Gold: %d\n", self.totalgold);
+    fclose(file);
 }
 void End()
 {
@@ -387,6 +430,7 @@ void End()
         printf("You gained a total of %d exp and %d gold!\n", self.totalexp, self.totalgold);
         printf("Thank you for playing!\n");
         system("pause");
+        CreateScore();
         exit(0);
     }
 }
@@ -396,7 +440,7 @@ void Generate_map()
     int distanceY = 0;
     int distanceX = 0;
     int biome_id = 0;
-    int flag=0;
+    int flag = 0;
 
     srand(time(NULL));
 
@@ -411,27 +455,24 @@ void Generate_map()
         }
     }
 
-    for(i=0;i<SIZE_Y;i++)
+    for (i = 0; i < SIZE_Y; i++)
     {
-        for(j=0;j<SIZE_X;j++)
+        for (j = 0; j < SIZE_X; j++)
         {
-            if(map[i][j][0]!=3)
+            if (map[i][j][0] != 3)
             {
-                x=j;
-                y=i;
-                map[y][x][1]=1;
-                flag=1;
+                x = j;
+                y = i;
+                map[y][x][1] = 1;
+                flag = 1;
                 break;
-
             }
-
         }
 
-            if(flag==1)
-            {
-                break;
-            }
-
+        if (flag == 1)
+        {
+            break;
+        }
     }
 
     for (i = 0; i < 30; i++)
@@ -454,10 +495,9 @@ void Generate_map()
     }
 }
 
-
 void Print_map()
 {
-
+    FontSize(25);
     for (i = 0; i < SIZE_Y; i++)
     {
         for (j = 0; j < SIZE_X; j++)
@@ -486,41 +526,42 @@ void Print_map()
 
         printf("\n");
     }
+    printf("\033[0m");
+    printf("Controls: w, a, s, d\n");
+    printf("Press q to quit\n");
 }
-
 
 void MoveControl()
 {
     do
     {
 
-    Controller = getch();
+        Controller = getch();
 
-
-    }while(Controller!='w' && Controller!='a' && Controller!='s' && Controller!='d');
+    } while (Controller != 'w' && Controller != 'a' && Controller != 's' && Controller != 'd' && Controller != 'q');
 }
 
 void MoveUpdate()
 {
-    if (Controller == 'w' && y-1>=0 && map[y-1][x][0]!=3)
+    if (Controller == 'w' && y - 1 >= 0 && map[y - 1][x][0] != 3)
     {
         map[y][x][1] = 0;
         y = y - 1;
         map[y][x][1] = 1;
     }
-    else if (Controller == 's' && y+1<=SIZE_Y-1 && map[y+1][x][0]!=3)
+    else if (Controller == 's' && y + 1 <= SIZE_Y - 1 && map[y + 1][x][0] != 3)
     {
         map[y][x][1] = 0;
         y = y + 1;
         map[y][x][1] = 1;
     }
-    else if (Controller == 'a' && x-1>=0 && map[y][x-1][0]!=3)
+    else if (Controller == 'a' && x - 1 >= 0 && map[y][x - 1][0] != 3)
     {
         map[y][x][1] = 0;
         x = x - 1;
         map[y][x][1] = 1;
     }
-    else if (Controller == 'd' && x+1<=SIZE_X-1 && map[y][x+1][0]!=3)
+    else if (Controller == 'd' && x + 1 <= SIZE_X - 1 && map[y][x + 1][0] != 3)
     {
         map[y][x][1] = 0;
         x = x + 1;
@@ -528,18 +569,13 @@ void MoveUpdate()
     }
     srand(time(NULL));
     Ecounter = rand() % 100 + 1;
-    if (Ecounter>=1 && Ecounter<=50)
+    if (Ecounter >= 1 && Ecounter <= 50 && Controller != 'q')
     {
-        printf("a monster attacked you!\n");
+        printf("\033[0;31m");
+        printf("\na monster attacked you!\n");
+        printf("\033[0m");
         Sleep(1000);
         system("cls");
         Combat();
     }
-
 }
-
-
-
-
-
-

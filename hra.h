@@ -5,23 +5,20 @@
 #include <conio.h>
 #include <stdlib.h>
 
-void Start();
-
-void Render();
-
-void Events();
-
-void Update();
-
-
-/*--------------------------------------------------------------------------------------------------------------------------------------*/
-
+void FontSize(int size);
 
 void Welcome();
+
 void Menu();
+
 void StartPlayer();
+
 void Combat();
+
 void levelUp();
+
+void CreateScore();
+
 void End();
 
 void Generate_map();
