@@ -29,36 +29,30 @@ struct stats
 
 void Start()
 {
+    Welcome();
     x=10;
     y=10;
     Generate_map();
-
-    Welcome();
     StartPlayer();
-}
-void Events()
-{
-    MoveControl();
-
-
-
-    system("cls");
-}
-
-void Update()
-{
-    MoveUpdate();
-
-    levelUp();
 }
 
 void Render()
 {
-    Print_map();
-   
     Menu();
-    Combat();
 }
+
+void Events()
+{
+    
+}
+
+void Update()
+{
+    
+
+    levelUp();
+}
+
 
 void Welcome()
 {
@@ -100,6 +94,13 @@ void Menu()
     {
     case '1':
     {
+        while(1)
+        {
+        Print_map();
+        MoveControl();
+        MoveUpdate();
+        system("cls");
+        }
     }
     break;
     case '2':
