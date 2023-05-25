@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <stdlib.h>
 #include <time.h>
+#include <conio.h>
 
 void Start();
 
@@ -17,5 +18,5 @@ void Menu();
 void StartPlayer();
 void Combat();
 void levelUp();
-
+void End();
 

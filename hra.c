@@ -9,8 +9,10 @@ struct stats
     int dmg;
     int lvl;
     int exp;
+    int totalexp;
     int maxexp;
     int gold;
+    int totalgold;
     int armor;
     int weapondmg;
 } self, monster;
@@ -55,7 +57,9 @@ void StartPlayer()
     self.lvl = 1;
     self.exp = 0;
     self.maxexp = 100;
+    self.totalexp = 0;
     self.gold = 0;
+    self.totalgold = 0;
     self.armor = 0;
     self.weapondmg = 0;
 }
@@ -67,16 +71,15 @@ void Menu()
     printf("2......... Inventory\n");
     printf("3......... Shop\n");
     printf("4......... Exit\n");
-    int choice;
-    scanf("%d", &choice);
+    char choice = getch();
     system("cls");
     switch (choice)
     {
-    case 1:
+    case '1':
     {
     }
     break;
-    case 2:
+    case '2':
     {
         printf("Your HP: %d/%d\n", self.hp, self.maxhp);
         printf("Your armor: %d\n", self.armor);
@@ -92,7 +95,7 @@ void Menu()
         system("cls");
     }
     break;
-    case 3:
+    case '3':
     {
 
         // Výpis vybraného řádku
@@ -101,10 +104,10 @@ void Menu()
         system("pause");
     }
     break;
-    case 4:
+    case '4':
     {
-        printf("Goodbye %s!\n", nickname);
-        exit(0);
+        self.hp = 0;
+        End();
     }
     break;
 
@@ -121,7 +124,7 @@ void Combat()
     int enemy = rand() % 4 + 1;
     monster.maxhp = rand() % 100 + 1;
     monster.hp = monster.maxhp;
-    monster.dmg = rand() % 10 + 1;
+    monster.dmg = rand() % 31 + 20;
     monster.gold = rand() % 100 + 1;
     monster.exp = rand() % 100 + 1;
     printf("-----------------------------------------------------------------\n");
@@ -142,7 +145,7 @@ void Combat()
         printf("You have encountered a cyclops!\n");
     }
     printf("-----------------------------------------------------------------\n");
-    while (monster.hp > 0)
+    while (monster.hp > 0 && self.hp > 0)
     {
         switch (enemy)
         {
@@ -205,13 +208,12 @@ void Combat()
         printf("3......... Defend\n");
         printf("4......... Inventory\n");
         printf("5......... Run\n");
-        int choice;
-        scanf("%d", &choice);
-        printf("\033[7A");
+        char choice = getch();
+        printf("\033[6A");
         printf("\033[0J");
         switch (choice)
         {
-        case 1:
+        case '1':
         {
             printf("You chose to attack!\n");
             printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg);
@@ -221,23 +223,22 @@ void Combat()
             printf("\033[0J");
         }
         break;
-        case 2:
+        case '2':
         {
             printf("You chose to use a skill!\n");
             printf("1......... Fireball\n");
             printf("2......... Icebolt\n");
             printf("3......... Lightning\n");
-            int skill;
-            scanf("%d", &skill);
-            printf("\033[5A");
+            char skill = getch();
+            printf("\033[4A");
             printf("\033[0J");
             switch (skill)
             {
-            case 1:
+            case '1':
             {
                 if (self.mana < 10)
                 {
-                   printf("The skill didn't work!\n");
+                    printf("The skill didn't work!\n");
                     printf("You don't have enough mana!\n");
                     break;
                 }
@@ -247,7 +248,7 @@ void Combat()
                 self.mana -= 10;
             }
             break;
-            case 2:
+            case '2':
             {
                 if (self.mana < 15)
                 {
@@ -261,7 +262,7 @@ void Combat()
                 self.mana -= 15;
             }
             break;
-            case 3:
+            case '3':
             {
                 if (self.mana < 20)
                 {
@@ -285,7 +286,7 @@ void Combat()
             printf("\033[0J");
         }
         break;
-        case 3:
+        case '3':
         {
             printf("You chose to defend!\n");
             self.armor += rand() % 21 + 10;
@@ -295,11 +296,11 @@ void Combat()
             printf("\033[0J");
         }
         break;
-        case 4:
+        case '4':
         {
         }
         break;
-        case 5:
+        case '5':
         {
             printf("You chose to run!\n");
             if (rand() % 2 == 0)
@@ -339,22 +340,24 @@ void Combat()
                 self.armor = 0;
             }
             system("pause");
-            printf("\033[3A");
+            printf("\033[2A");
             printf("\033[0J");
         }
-        if (self.hp <= 0)
-        {
-            printf("You died!\n");
-            printf("Game over!\n");
-            exit(0);
-        }
+       
         system("cls");
     }
-    fclose(f);
+    if(self.hp>0)
+    {
     printf("You have defeated the monster!\n");
     printf("You gained %d gold and %d exp!\n", monster.gold, monster.exp);
     self.gold += monster.gold;
     self.exp += monster.exp;
+    self.totalgold += self.gold;
+    self.totalexp += self.exp;
+    }
+    if (f != NULL)  fclose(f);
+    End();
+
     system("pause");
     system("cls");
 }
@@ -374,5 +377,17 @@ void levelUp()
         printf("You gained 10 max mana!\n");
         printf("You gained 5 damage!\n");
         system("pause");
+    }
+}
+void End()
+{
+    if (self.hp <= 0)
+    {
+        printf("It's Game Over for %s!\n", nickname);
+        printf("You reached level %d!\n", self.lvl);
+        printf("You gained a total of %d exp and %d gold!\n", self.totalexp, self.totalgold);
+        printf("Thank you for playing!\n");
+        system("pause");
+        exit(0);
     }
 }
