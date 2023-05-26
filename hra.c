@@ -28,17 +28,8 @@ struct stats
     int weapondmg;
 } self, monster;
 
-void FontSize(int size)
-{
-    CONSOLE_FONT_INFOEX fontInfo;
-    fontInfo.cbSize = sizeof(CONSOLE_FONT_INFOEX);
-    GetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &fontInfo);
-    fontInfo.dwFontSize.Y = size; // Set the desired font height
-    SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &fontInfo);
-}
 void Welcome()
 {
-    FontSize(30);
     FILE *f = fopen("title.txt", "r");
     char c;
     while ((c = fgetc(f)) != EOF)
@@ -55,6 +46,7 @@ void Welcome()
     system("cls");
     printf("Hello %s,\n", nickname);
     Sleep(1000);
+    self.gold=80;
 }
 void StartPlayer()
 {
@@ -77,7 +69,6 @@ void Menu()
 {
     Controller = 'V';
     system("cls");
-    FontSize(30);
     printf("What do you want to do?\n");
     printf("1......... Explore\n");
     printf("2......... Status/Inventory\n");
@@ -114,15 +105,16 @@ void Menu()
         printf("Items:\n");
         system("pause");
         system("cls");
+        UsePotion();
+        system("cls");
+        printf("\n");
     }
     break;
     case '3':
     {
 
-        // Výpis vybraného řádku
-        printf("Welcome to the shop!\n");
-        printf("What do you want to buy?\n");
-        system("pause");
+        shop();
+
     }
     break;
     case '4':
@@ -138,7 +130,6 @@ void Menu()
 }
 void Combat()
 {
-    FontSize(20);
     srand(time(NULL));
     FILE *f;
     // open a random .txt file from the folder enemies
@@ -393,7 +384,6 @@ void Combat()
 }
 void levelUp()
 {
-    FontSize(30);
     if (self.exp >= self.maxexp)
     {
         self.lvl++;
@@ -425,13 +415,13 @@ void End()
 {
     if (self.hp <= 0)
     {
-        FontSize(30);
         printf("It's Game Over for %s!\n", nickname);
         printf("You reached level %d!\n", self.lvl);
         printf("You gained a total of %d exp and %d gold!\n", self.totalexp, self.totalgold);
         printf("Thank you for playing!\n");
         system("pause");
         CreateScore();
+        ResetItems();
         exit(0);
     }
 }
@@ -498,7 +488,6 @@ void Generate_map()
 
 void Print_map()
 {
-    FontSize(25);
     for (i = 0; i < SIZE_Y; i++)
     {
         for (j = 0; j < SIZE_X; j++)
@@ -579,4 +568,263 @@ void MoveUpdate()
         system("cls");
         Combat();
     }
+}
+
+void shop()
+{
+    char koupe;
+
+
+    printf("Welcome to shop \n");
+    Sleep(500);
+    printf("This is what we offer\n\n");
+    Sleep(1500);
+    system("cls");
+
+    do
+    {
+
+    printf("1)HEALTH POTION - 30 gold \n");
+    printf("gives you 25 hp \n\n");
+
+    printf("2)MANA POTION - 30 gold \n");
+    printf("gives you 30 mana power \n\n");
+
+    printf("Press q to leave \n");
+
+    koupe=getch();
+
+    if(koupe=='1')
+    {
+        if(self.gold>=30)
+        {
+            self.gold=self.gold-30;
+            printf("\n");
+            printf("you spent 30 gold on health potion \n");
+            UpdateItemNumber("health potion");
+            Sleep(1200);
+            system("cls");
+        }
+        else
+        {
+            printf("\n");
+            printf("you are too poor :( \n");
+            Sleep(1200);
+            system("cls");
+        }
+    }
+
+    if(koupe=='2')
+    {
+        if(self.gold>=30)
+        {
+            self.gold=self.gold-30;
+            printf("\n");
+            printf("you spent 30 gold on mana potion \n");
+            UpdateItemNumber("mana potion");
+            Sleep(1200);
+            system("cls");
+        }
+        else
+        {
+            printf("\n");
+            printf("you are too poor :( \n");
+            Sleep(1200);
+            system("cls");
+        }
+    }
+
+    system("cls");
+
+    }while(koupe!='q');
+
+}
+
+void PrintItems() 
+{
+    FILE* file = fopen("items.txt", "r");
+    if (file == NULL) {
+        printf("Failed to open the file.\n");
+        return;
+    }
+
+    int ch;
+    while ((ch = fgetc(file)) != EOF) {
+        putchar(ch);
+    }
+
+    if (ferror(file)) {
+        printf("Error occurred while reading the file.\n");
+    }
+
+    fclose(file);
+}
+
+
+void UpdateItemNumber(const char* itemName) {
+    const char* filePath = "items.txt";
+
+    // Read the contents of the file
+    FILE* file = fopen(filePath, "r");
+    if (file == NULL) {
+        printf("Failed to open the file.\n");
+        return;
+    }
+
+    char line[100];
+    char modifiedContent[500] = "";
+    int foundItem = 0;
+
+    while (fgets(line, sizeof(line), file)) {
+        // Check if the line contains the specified item name
+        if (strstr(line, itemName) != NULL) {
+            foundItem = 1;
+
+            // Extract the item ID and quantity from the line
+            int id, quantity;
+            sscanf(line, "%d)%*[^0-9]%d", &id, &quantity);
+
+            // Increment the quantity by 1
+            quantity++;
+
+            // Generate the modified line with the updated quantity
+            char modifiedLine[100];
+            snprintf(modifiedLine, sizeof(modifiedLine), "%d)%s %d\n", id, itemName, quantity);
+
+            // Append the modified line to the content string
+            strcat(modifiedContent, modifiedLine);
+        } else {
+            // Append the original line to the content string
+            strcat(modifiedContent, line);
+        }
+    }
+
+    fclose(file);
+
+    if (!foundItem) {
+        printf("Item not found in the file.\n");
+        return;
+    }
+
+    // Write the modified contents back to the file
+    file = fopen(filePath, "w");
+    if (file == NULL) {
+        printf("Failed to open the file for writing.\n");
+        return;
+    }
+
+    fputs(modifiedContent, file);
+
+    fclose(file);
+
+}
+
+void ResetItems() {
+    const char* filePath = "items.txt";
+    const char* resetLines[] = {"broken sword", "broken armor", "broken shield"};
+
+    // Open the file for writing
+    FILE* file = fopen(filePath, "w");
+    if (file == NULL) {
+        printf("Failed to open the file.\n");
+        return;
+    }
+
+    // Write the new lines for the first three items
+    for (int i = 0; i < 3; i++) {
+        fprintf(file, "%s\n", resetLines[i]);
+    }
+
+    // Write 0 for all other items
+    fprintf(file, "\n1)health potion 0\n2)mana potion 0\n");
+
+    fclose(file);
+
+}
+
+void UsePotion()
+{
+    char input;
+
+
+    do
+    {
+        PrintItems();
+        input=getch();
+
+        if(input=='1' || input=='2')
+        {
+            DecreaseItemCount(input);
+        }
+
+
+    } while (input!='q');
+    
+}
+
+void DecreaseItemCount(char itemId) {
+    const char* filePath = "items.txt";
+
+    // Read the contents of the file
+    FILE* file = fopen(filePath, "r");
+    if (file == NULL) {
+        printf("Failed to open the file.\n");
+        return;
+    }
+
+    char line[100];
+    char modifiedContent[500] = "";
+    int foundItem = 0;
+
+    while (fgets(line, sizeof(line), file)) {
+        char idChar;
+        int quantity;
+        if (sscanf(line, "%c)%*[^0-9]%d", &idChar, &quantity) == 2 && idChar == itemId) {
+            foundItem = 1;
+
+            // Check if the quantity is already 0
+            if (quantity == 0) {
+                printf("You drank air.\n");
+                fclose(file);
+                return;
+            }
+
+            // Decrease the quantity by 1
+            quantity--;
+
+            // Get the item name without modifying the original line
+            char itemName[50];
+            sscanf(line, "%*[^)]%*c%[^\n]", itemName);
+
+            // Generate the modified line with the updated quantity
+            char modifiedLine[100];
+            snprintf(modifiedLine, sizeof(modifiedLine), "%c)%s %d\n", idChar, itemName, quantity);
+
+            // Append the modified line to the content string
+            strcat(modifiedContent, modifiedLine);
+        } else {
+            // Append the original line to the content string
+            strcat(modifiedContent, line);
+        }
+    }
+
+    fclose(file);
+
+    if (!foundItem) {
+        printf("Item not found in the file.\n");
+        return;
+    }
+
+    // Write the modified contents back to the file
+    file = fopen(filePath, "w");
+    if (file == NULL) {
+        printf("Failed to open the file for writing.\n");
+        return;
+    }
+
+    fputs(modifiedContent, file);
+
+    fclose(file);
+
+    printf("You drank the potion.\n");
 }

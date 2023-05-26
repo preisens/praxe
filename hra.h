@@ -5,7 +5,6 @@
 #include <conio.h>
 #include <stdlib.h>
 
-void FontSize(int size);
 
 void Welcome();
 
@@ -29,7 +28,14 @@ void MoveControl();
 
 void MoveUpdate();
 
+void shop();
 
+void PrintItems();
 
+void UpdateItemNumber(const char* itemName);
 
+void ResetItems();
 
+void UsePotion();
+
+void DecreaseItemCount(char itemId);
