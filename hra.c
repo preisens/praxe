@@ -25,20 +25,13 @@ struct stats
     int gold;
     int totalgold;
     int armor;
+    int defense;
     int weapondmg;
+    int totaldmg;
 } self, monster;
 
-void FontSize(int size)
-{
-    CONSOLE_FONT_INFOEX fontInfo;
-    fontInfo.cbSize = sizeof(CONSOLE_FONT_INFOEX);
-    GetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &fontInfo);
-    fontInfo.dwFontSize.Y = size; // Set the desired font height
-    SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &fontInfo);
-}
 void Welcome()
 {
-    FontSize(30);
     FILE *f = fopen("title.txt", "r");
     char c;
     while ((c = fgetc(f)) != EOF)
@@ -62,7 +55,7 @@ void StartPlayer()
     self.maxhp = 100;
     self.hp = 100;
     self.maxmana = 100;
-    self.mana = 20;
+    self.mana = 100;
     self.dmg = rand() % 21 + 20;
     self.lvl = 1;
     self.exp = 0;
@@ -73,11 +66,11 @@ void StartPlayer()
     self.armor = 0;
     self.weapondmg = 0;
 }
+
 void Menu()
 {
     Controller = 'V';
     system("cls");
-    FontSize(30);
     printf("What do you want to do?\n");
     printf("1......... Explore\n");
     printf("2......... Status/Inventory\n");
@@ -138,16 +131,15 @@ void Menu()
 }
 void Combat()
 {
-    FontSize(20);
     srand(time(NULL));
     FILE *f;
     // open a random .txt file from the folder enemies
     int enemy = rand() % 4 + 1;
-    monster.maxhp = rand() % 100 + 1;
+    monster.maxhp = rand() % 81+10;
     monster.hp = monster.maxhp;
     monster.dmg = rand() % 31 + 20;
-    monster.gold = rand() % 100 + 1;
-    monster.exp = rand() % 100 + 1;
+    monster.exp = monster.maxhp + monster.dmg;
+    monster.gold = monster.exp / 2;
     if (enemy == 1)
     {
         printf("You have encountered a goblin!\n");
@@ -231,7 +223,7 @@ void Combat()
         printf("-----------------------------------------------------------------\n");
         printf("\t\t\tYOUR STATS\t\t\t\t|\n");
         printf("-----------------------------------------------------------------\n");
-        printf("\tHP: %d/%d\tMANA: %d/%d\tARMOR: %d\n", self.hp, self.maxhp, self.mana, self.maxmana, self.armor);
+        printf("\tHP: %d/%d\tMANA: %d/%d\tARMOR: %d\tDMG: %d\n", self.hp, self.maxhp, self.mana, self.maxmana, self.armor,self.dmg+self.weapondmg);
         printf("\nWhat do you want to do?\n");
         printf("1......... Attack\n");
         printf("2......... Skills\n");
@@ -241,13 +233,14 @@ void Combat()
         char choice = getch();
         printf("\033[6A");
         printf("\033[0J");
+        self.totaldmg=self.dmg+self.weapondmg+rand()%16+0;
         switch (choice)
         {
         case '1':
         {
             printf("You chose to attack!\n");
-            printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg);
-            monster.hp -= self.dmg + self.weapondmg;
+            printf("You dealt %d damage to the monster!\n", self.totaldmg);
+            monster.hp -= self.totaldmg;
             system("pause");
             printf("\033[3A");
             printf("\033[0J");
@@ -273,8 +266,8 @@ void Combat()
                     break;
                 }
                 printf("You used Fireball!\n");
-                printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg + 5);
-                monster.hp -= self.dmg + self.weapondmg + 5;
+                printf("You dealt %d damage to the monster!\n", self.totaldmg + 5);
+                monster.hp -= self.totaldmg + 5;
                 self.mana -= 10;
             }
             break;
@@ -287,8 +280,8 @@ void Combat()
                     break;
                 }
                 printf("You used Icebolt!\n");
-                printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg + 10);
-                monster.hp -= self.dmg + self.weapondmg + 10;
+                printf("You dealt %d damage to the monster!\n", self.totaldmg+ 10);
+                monster.hp -= self.totaldmg + 10;
                 self.mana -= 15;
             }
             break;
@@ -301,8 +294,8 @@ void Combat()
                     break;
                 }
                 printf("You used Lightning!\n");
-                printf("You dealt %d damage to the monster!\n", self.dmg + self.weapondmg + 15);
-                monster.hp -= self.dmg + self.weapondmg + 15;
+                printf("You dealt %d damage to the monster!\n", self.totaldmg+ 15);
+                monster.hp -= self.totaldmg + 15;
                 self.mana -= 20;
             }
             break;
@@ -319,8 +312,8 @@ void Combat()
         case '3':
         {
             printf("You chose to defend!\n");
-            self.armor += rand() % 21 + 10;
-            printf("You gained %d armor!\n", self.armor);
+            self.defense = rand() % 31 + 20;
+            printf("You are blocking %d of dmg!\n", self.defense);
             system("pause");
             printf("\033[3A");
             printf("\033[0J");
@@ -351,24 +344,18 @@ void Combat()
         }
         if (monster.hp > 0)
         {
+            monster.totaldmg = (monster.dmg+rand()%16+0) - self.defense;
             printf("The monster attacked you!\n");
-            if (monster.dmg - self.armor >= 0)
+            if (monster.totaldmg >= 0)
             {
-                printf("The monster dealt %d damage to you!\n", monster.dmg - self.armor);
+                printf("The monster dealt %d damage to you!\n", monster.totaldmg);
+                self.hp -= monster.totaldmg;
             }
             else
             {
                 printf("The monster dealt 0 damage to you!\n");
             }
-            if (self.armor < monster.dmg)
-            {
-                self.hp -= monster.dmg - self.armor;
-            }
-            self.armor -= monster.dmg;
-            if (self.armor < 0)
-            {
-                self.armor = 0;
-            }
+            self.defense = 0;
             system("pause");
             printf("\033[2A");
             printf("\033[0J");
@@ -393,7 +380,6 @@ void Combat()
 }
 void levelUp()
 {
-    FontSize(30);
     if (self.exp >= self.maxexp)
     {
         self.lvl++;
@@ -425,7 +411,6 @@ void End()
 {
     if (self.hp <= 0)
     {
-        FontSize(30);
         printf("It's Game Over for %s!\n", nickname);
         printf("You reached level %d!\n", self.lvl);
         printf("You gained a total of %d exp and %d gold!\n", self.totalexp, self.totalgold);
@@ -498,7 +483,6 @@ void Generate_map()
 
 void Print_map()
 {
-    FontSize(25);
     for (i = 0; i < SIZE_Y; i++)
     {
         for (j = 0; j < SIZE_X; j++)
@@ -570,7 +554,7 @@ void MoveUpdate()
     }
     srand(time(NULL));
     Ecounter = rand() % 100 + 1;
-    if (Ecounter >= 1 && Ecounter <= 50 && Controller != 'q')
+    if (Ecounter >= 1 && Ecounter <= 30 && Controller != 'q')
     {
         printf("\033[0;31m");
         printf("\na monster attacked you!\n");
@@ -578,5 +562,27 @@ void MoveUpdate()
         Sleep(1000);
         system("cls");
         Combat();
+    }
+    if(Ecounter>=31 && Ecounter<=50 && Controller!='q')
+    {
+        printf("\033[0;32m");
+        printf("\nYou found a resting spot!\n");
+        int hpgain = rand()%71+30;
+        int managain = rand()%71+30;
+        self.hp+=hpgain;
+        self.mana+=managain;
+        if(self.hp>self.maxhp)
+        {
+            self.hp=self.maxhp;
+        }
+        if(self.mana>self.maxmana)
+        {
+            self.mana=self.maxmana;
+        }
+        printf("You gained %d HP!\n",hpgain);
+        printf("You gained %d MANA!\n",managain);
+        printf("\033[0m");
+        Sleep(2000);
+        system("cls");
     }
 }

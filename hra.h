@@ -4,8 +4,8 @@
 #include <unistd.h>
 #include <conio.h>
 #include <stdlib.h>
+#include <dirent.h>
 
-void FontSize(int size);
 
 void Welcome();
 
