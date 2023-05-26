@@ -11,6 +11,8 @@ void Welcome();
 
 void Menu();
 
+char* getRandomMonster(const char* folderPath);
+
 void StartPlayer();
 
 void Combat();
@@ -28,6 +30,7 @@ void Print_map();
 void MoveControl();
 
 void MoveUpdate();
+
 
 
 

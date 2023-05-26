@@ -57,7 +57,7 @@ void StartPlayer()
     self.maxmana = 100;
     self.mana = 100;
     self.dmg = rand() % 21 + 20;
-    self.lvl = 1;
+    self.lvl = 0;
     self.exp = 0;
     self.maxexp = 100;
     self.totalexp = 0;
@@ -66,7 +66,42 @@ void StartPlayer()
     self.armor = 0;
     self.weapondmg = 0;
 }
+char *getRandomMonster(const char *folderPath)
+{
+    DIR *dir;
+    struct dirent *entry;
+    int fileCount = 0;
+    char **fileList = NULL;
 
+    dir = opendir(folderPath);
+    // Count the number of files in the directory
+    while ((entry = readdir(dir)) != NULL)
+    {
+        if (entry->d_type == DT_REG)
+        {
+            fileCount++;
+            fileList = realloc(fileList, fileCount * sizeof(char *));
+            fileList[fileCount - 1] = malloc(strlen(entry->d_name) + 1);
+            strcpy(fileList[fileCount - 1], entry->d_name);
+        }
+    }
+    closedir(dir);
+
+    srand(time(NULL));
+    int randomIndex = rand() % fileCount;
+
+    char *filePath = malloc(strlen(folderPath) + strlen(fileList[randomIndex]) + 2);
+    sprintf(filePath, "%s/%s", folderPath, fileList[randomIndex]);
+
+    // Free memory
+    for (int i = 0; i < fileCount; i++)
+    {
+        free(fileList[i]);
+    }
+    free(fileList);
+
+    return filePath;
+}
 void Menu()
 {
     Controller = 'V';
@@ -83,7 +118,7 @@ void Menu()
     case '1':
     {
 
-        while (Controller!='q')
+        while (Controller != 'q')
         {
             levelUp();
             Print_map();
@@ -135,86 +170,35 @@ void Combat()
     FILE *f;
     // open a random .txt file from the folder enemies
     int enemy = rand() % 4 + 1;
-    monster.maxhp = rand() % 81+10;
+    monster.maxhp = rand() % 81 + 10;
     monster.hp = monster.maxhp;
     monster.dmg = rand() % 31 + 20;
     monster.exp = monster.maxhp + monster.dmg;
     monster.gold = monster.exp / 2;
-    if (enemy == 1)
+    char *filePath = getRandomMonster("enemies");
+    char *fileName = strrchr(filePath, '/');
+    if (fileName == NULL)
     {
-        printf("You have encountered a goblin!\n");
+        fileName = filePath;
     }
-    else if (enemy == 2)
+    else
     {
-        printf("You have encountered a golem!\n");
+        fileName++;
     }
-    else if (enemy == 3)
-    {
-        printf("You have encountered a slime!\n");
-    }
-    else if (enemy == 4)
-    {
-        printf("You have encountered a cyclops!\n");
-    }
-    Sleep(1000);
+    char *nameWithoutExtension = malloc(strlen(fileName) - 3);
+    strncpy(nameWithoutExtension, fileName, strlen(fileName) - 4);
+    nameWithoutExtension[strlen(fileName) - 4] = '\0';
+
+    printf("You encountered a %s!\n", nameWithoutExtension);
     system("pause");
     system("cls");
     while (monster.hp > 0 && self.hp > 0)
     {
-        switch (enemy)
+        FILE *file = fopen(filePath, "r");
+        int c;
+        while ((c = fgetc(file)) != EOF)
         {
-        case 1:
-        {
-            f = fopen("enemies/goblin.txt", "r");
-            // open the file and print it to the console
-            char c;
-            while ((c = fgetc(f)) != EOF)
-            {
-                printf("%c", c);
-            }
-        }
-        break;
-        case 2:
-        {
-            f = fopen("enemies/golem.txt", "r");
-            // open the file and print it to the console
-            char c;
-            while ((c = fgetc(f)) != EOF)
-            {
-                printf("%c", c);
-            }
-        }
-        break;
-        case 3:
-        {
-            f = fopen("enemies/slime.txt", "r");
-            char c;
-            while ((c = fgetc(f)) != EOF)
-            {
-                if(c!='@')
-                {
-                    printf("\033[0;32m");
-                }
-                else
-                {
-                    printf("\033[0m");
-                }
-                printf("%c", c);
-            }
-             printf("\033[0m");
-        }
-        break;
-        case 4:
-        {
-            f = fopen("enemies/cyclops.txt", "r");
-            // open the file and print it to the console
-            char c;
-            while ((c = fgetc(f)) != EOF)
-            {
-                printf("%c", c);
-            }
-        }
-        break;
+            putchar(c);
         }
         printf("-----------------------------------------------------------------\n");
         printf("\t\t\tENEMY STATS\t\t\t\t|\n");
@@ -223,7 +207,7 @@ void Combat()
         printf("-----------------------------------------------------------------\n");
         printf("\t\t\tYOUR STATS\t\t\t\t|\n");
         printf("-----------------------------------------------------------------\n");
-        printf("\tHP: %d/%d\tMANA: %d/%d\tARMOR: %d\tDMG: %d\n", self.hp, self.maxhp, self.mana, self.maxmana, self.armor,self.dmg+self.weapondmg);
+        printf("\tHP: %d/%d\tMANA: %d/%d\tARMOR: %d\tDMG: %d\n", self.hp, self.maxhp, self.mana, self.maxmana, self.armor, self.dmg + self.weapondmg);
         printf("\nWhat do you want to do?\n");
         printf("1......... Attack\n");
         printf("2......... Skills\n");
@@ -233,7 +217,7 @@ void Combat()
         char choice = getch();
         printf("\033[6A");
         printf("\033[0J");
-        self.totaldmg=self.dmg+self.weapondmg+rand()%16+0;
+        self.totaldmg = self.dmg + self.weapondmg + rand() % 16 + 0;
         switch (choice)
         {
         case '1':
@@ -249,54 +233,71 @@ void Combat()
         case '2':
         {
             printf("You chose to use a skill!\n");
-            printf("1......... Fireball\n");
-            printf("2......... Icebolt\n");
-            printf("3......... Lightning\n");
+            printf("1.......... Normal skills\n");
+            printf("2.......... Special skills\n");
             char skill = getch();
-            printf("\033[4A");
+            printf("\033[3A");
             printf("\033[0J");
             switch (skill)
             {
             case '1':
             {
-                if (self.mana < 10)
+                printf("1.......... Fireball\n");
+                printf("2.......... Icebolt\n");
+                printf("3.......... Lightning\n");
+                char normal = getch();
+                printf("\033[3A");
+                printf("\033[0J");
+                switch (normal)
                 {
-                    printf("The skill didn't work!\n");
-                    printf("You don't have enough mana!\n");
-                    break;
+                case '1':
+                {
+                    if (self.mana < 10)
+                    {
+                        printf("The skill didn't work!\n");
+                        printf("You don't have enough mana!\n");
+                        break;
+                    }
+                    printf("You used Fireball!\n");
+                    printf("You dealt %d damage to the monster!\n", self.totaldmg + 5);
+                    monster.hp -= self.totaldmg + 5;
+                    self.mana -= 10;
                 }
-                printf("You used Fireball!\n");
-                printf("You dealt %d damage to the monster!\n", self.totaldmg + 5);
-                monster.hp -= self.totaldmg + 5;
-                self.mana -= 10;
+                break;
+                case '2':
+                {
+                    if (self.mana < 15)
+                    {
+                        printf("The skill didn't work!\n");
+                        printf("You don't have enough mana!\n");
+                        break;
+                    }
+                    printf("You used Icebolt!\n");
+                    printf("You dealt %d damage to the monster!\n", self.totaldmg + 10);
+                    monster.hp -= self.totaldmg + 10;
+                    self.mana -= 15;
+                }
+                break;
+                case '3':
+                {
+                    if (self.mana < 20)
+                    {
+                        printf("The skill didn't work!\n");
+                        printf("You don't have enough mana!\n");
+                        break;
+                    }
+                    printf("You used Lightning!\n");
+                    printf("You dealt %d damage to the monster!\n", self.totaldmg + 15);
+                    monster.hp -= self.totaldmg + 15;
+                    self.mana -= 20;
+                }
+                break;
+                }
             }
             break;
             case '2':
             {
-                if (self.mana < 15)
-                {
-                    printf("The skill didn't work!\n");
-                    printf("You don't have enough mana!\n");
-                    break;
-                }
-                printf("You used Icebolt!\n");
-                printf("You dealt %d damage to the monster!\n", self.totaldmg+ 10);
-                monster.hp -= self.totaldmg + 10;
-                self.mana -= 15;
-            }
-            break;
-            case '3':
-            {
-                if (self.mana < 20)
-                {
-                    printf("The skill didn't work!\n");
-                    printf("You don't have enough mana!\n");
-                    break;
-                }
-                printf("You used Lightning!\n");
-                printf("You dealt %d damage to the monster!\n", self.totaldmg+ 15);
-                monster.hp -= self.totaldmg + 15;
-                self.mana -= 20;
+
             }
             break;
             }
@@ -344,7 +345,7 @@ void Combat()
         }
         if (monster.hp > 0)
         {
-            monster.totaldmg = (monster.dmg+rand()%16+0) - self.defense;
+            monster.totaldmg = (monster.dmg + rand() % 16 + 0) - self.defense;
             printf("The monster attacked you!\n");
             if (monster.totaldmg >= 0)
             {
@@ -362,6 +363,12 @@ void Combat()
         }
 
         system("cls");
+        if (monster.hp <= 0 || self.hp <= 0)
+        {
+            fclose(file);
+            free(filePath);
+            free(nameWithoutExtension);
+        }
     }
     if (self.hp > 0)
     {
@@ -372,8 +379,7 @@ void Combat()
         self.totalgold += self.gold;
         self.totalexp += self.exp;
     }
-    if (f != NULL)
-        fclose(f);
+
     End();
     system("pause");
     system("cls");
@@ -563,24 +569,24 @@ void MoveUpdate()
         system("cls");
         Combat();
     }
-    if(Ecounter>=31 && Ecounter<=50 && Controller!='q')
+    if (Ecounter >= 31 && Ecounter <= 50 && Controller != 'q')
     {
         printf("\033[0;32m");
         printf("\nYou found a resting spot!\n");
-        int hpgain = rand()%71+30;
-        int managain = rand()%71+30;
-        self.hp+=hpgain;
-        self.mana+=managain;
-        if(self.hp>self.maxhp)
+        int hpgain = rand() % 71 + 30;
+        int managain = rand() % 71 + 30;
+        self.hp += hpgain;
+        self.mana += managain;
+        if (self.hp > self.maxhp)
         {
-            self.hp=self.maxhp;
+            self.hp = self.maxhp;
         }
-        if(self.mana>self.maxmana)
+        if (self.mana > self.maxmana)
         {
-            self.mana=self.maxmana;
+            self.mana = self.maxmana;
         }
-        printf("You gained %d HP!\n",hpgain);
-        printf("You gained %d MANA!\n",managain);
+        printf("You gained %d HP!\n", hpgain);
+        printf("You gained %d MANA!\n", managain);
         printf("\033[0m");
         Sleep(2000);
         system("cls");
