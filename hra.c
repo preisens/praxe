@@ -2,6 +2,7 @@
 
 #define SIZE_Y 30
 #define SIZE_X 60
+#define MAX_SCORES 3
 
 int Ecounter = 0;
 int i, j, k;
@@ -9,6 +10,14 @@ int map[SIZE_Y][SIZE_X][2];
 char Controller = 'V';
 int x = 10;
 int y = 10;
+int option = 1;
+int keyPressed;
+
+typedef struct
+{
+    char name[100];
+    float score;
+} ScoreEntry;
 
 char nickname[20];
 struct stats
@@ -77,7 +86,11 @@ char *getRandomMonster(const char *folderPath)
     // Count the number of files in the directory
     while ((entry = readdir(dir)) != NULL)
     {
-        if (entry->d_type == DT_REG)
+        // Check if it's a regular file using stat()
+        struct stat fileStat;
+        char filePath[PATH_MAX];
+        snprintf(filePath, sizeof(filePath), "%s/%s", folderPath, entry->d_name);
+        if (stat(filePath, &fileStat) == 0 && S_ISREG(fileStat.st_mode))
         {
             fileCount++;
             fileList = realloc(fileList, fileCount * sizeof(char *));
@@ -104,65 +117,148 @@ char *getRandomMonster(const char *folderPath)
 }
 void Menu()
 {
-    Controller = 'V';
-    system("cls");
-    printf("What do you want to do?\n");
-    printf("1......... Explore\n");
-    printf("2......... Status/Inventory\n");
-    printf("3......... Shop\n");
-    printf("4......... Exit\n");
-    char choice = getch();
-    system("cls");
-    switch (choice)
-    {
-    case '1':
-    {
 
-        while (Controller != 'q')
+    int totalOptions = 5;
+
+    while (1)
+    {
+        system("cls");
+        printf("What do you want to do?\n");
+        printf("1......... Explore%s\n", (option == 1) ? " <--" : "");
+        printf("2......... Status/Inventory%s\n", (option == 2) ? " <--" : "");
+        printf("3......... Shop%s\n", (option == 3) ? " <--" : "");
+        printf("4......... Leaderboard%s\n", (option == 4) ? " <--" : "");
+        printf("5......... Exit%s\n", (option == 5) ? " <--" : "");
+
+        keyPressed = getch();
+
+        if (keyPressed == 224) // Arrow keys
         {
-            levelUp();
-            Print_map();
-            MoveControl();
-            MoveUpdate();
-            system("cls");
+            keyPressed = getch(); // Read the arrow key code
+
+            if (keyPressed == 72) // Up arrow
+            {
+                if (option > 1)
+                    option--;
+                else
+                    option = totalOptions;
+            }
+            else if (keyPressed == 80) // Down arrow
+            {
+                if (option < totalOptions)
+                    option++;
+                else
+                    option = 1;
+            }
+        }
+        else // Other keys
+        {
+            switch (option)
+            {
+            case 1:
+            {
+                system("cls");
+                while (Controller != 'q')
+                {
+
+                    levelUp();
+                    Print_map();
+                    MoveControl();
+                    MoveUpdate();
+                }
+            }
+            break;
+            case 2:
+            {
+                system("cls");
+                printf("Your HP: %d/%d\n", self.hp, self.maxhp);
+                printf("Your armor: %d\n", self.armor);
+                printf("Your mana: %d/%d\n", self.mana, self.maxmana);
+                printf("Your damage: %d\n", self.dmg + self.weapondmg);
+                printf("Your level: %d\n", self.lvl);
+                printf("Your exp: %d/%d\n", self.exp, self.maxexp);
+                printf("Your gold: %d\n", self.gold);
+                system("pause");
+                system("cls");
+                printf("Items:\n");
+                // read items form inventory.txt
+                FILE *f = fopen("items/inventory.txt", "r");
+                char c;
+                while ((c = fgetc(f)) != EOF)
+                {
+                    printf("%c", c);
+                }
+                fclose(f);
+                system("pause");
+                system("cls");
+            }
+            break;
+            case 3:
+            {
+                system("cls");
+                printf("Welcome to the shop!\n");
+                printf("What do you want to buy?\n");
+                // read items from shop.txt, if you have enough gold you can buy it. If you buy it, it will be added to your inventory
+
+                system("pause");
+            }
+            break;
+            case 4:
+            {
+                system("cls");
+                FILE *file = fopen("score.txt", "r");
+                ScoreEntry scores[100];
+                int count = 0;
+                char name[100];
+                float score;
+
+                while (fscanf(file, "%[^:]: %f\n", name, &score) == 2)
+                {
+                    strcpy(scores[count].name, name);
+                    scores[count].score = score;
+                    count++;
+                }
+
+                fclose(file);
+
+                qsort(scores, count, sizeof(ScoreEntry), compare_scores);
+
+                int numScoresToPrint = count < 10 ? count : 10; // Select minimum of count or 10
+
+                printf("Top %d Scores:\n", numScoresToPrint);
+                for (int i = 0; i < numScoresToPrint; i++)
+                {
+                    printf("%d. %s: %.1f\n", i + 1, scores[i].name, scores[i].score);
+                }
+                system("pause");
+            }
+            break;
+            case 5:
+            {
+                self.hp = 0;
+                End();
+            }
+            break;
+            default:
+                printf("Wrong choice!\n");
+                break;
+            }
         }
     }
-    break;
-    case '2':
+}
+int compare_scores(const void *a, const void *b)
+{
+    const ScoreEntry *entryA = (const ScoreEntry *)a;
+    const ScoreEntry *entryB = (const ScoreEntry *)b;
+    if (entryA->score < entryB->score)
     {
-        printf("Your HP: %d/%d\n", self.hp, self.maxhp);
-        printf("Your armor: %d\n", self.armor);
-        printf("Your mana: %d/%d\n", self.mana, self.maxmana);
-        printf("Your damage: %d\n", self.dmg + self.weapondmg);
-        printf("Your level: %d\n", self.lvl);
-        printf("Your exp: %d/%d\n", self.exp, self.maxexp);
-        printf("Your gold: %d\n", self.gold);
-        system("pause");
-        system("cls");
-        printf("Items:\n");
-        system("pause");
-        system("cls");
+        return 1;
     }
-    break;
-    case '3':
+    else if (entryA->score > entryB->score)
     {
-
-        // Výpis vybraného řádku
-        printf("Welcome to the shop!\n");
-        printf("What do you want to buy?\n");
-        system("pause");
+        return -1;
     }
-    break;
-    case '4':
-    {
-        self.hp = 0;
-        End();
-    }
-    break;
-    default:
-        printf("Wrong choice!\n");
-        break;
-    }
+    return 0;
 }
 void Combat()
 {
@@ -297,7 +393,6 @@ void Combat()
             break;
             case '2':
             {
-
             }
             break;
             }
@@ -399,24 +494,66 @@ void levelUp()
         printf("You gained 10 max HP!\n");
         printf("You gained 10 max mana!\n");
         printf("You gained 5 damage!\n");
+
+        if (self.lvl % 3 == 0)
+        {
+            system("cls");
+            printf("Choose a special skill:\n");
+
+            // Načtení speciálních schopností ze souboru
+            FILE *file = fopen("skills/special.txt", "r");
+            if (file != NULL)
+            {
+                const int maxSkills = 3;
+                char skills[maxSkills][100]; // Max 100 znaků na řádek schopnosti
+
+                int numSkills = 0;
+                char line[100];
+                while (fgets(line, sizeof(line), file) != NULL)
+                {
+                    if (numSkills >= maxSkills)
+                    {
+                        break;
+                    }
+                    strncpy(skills[numSkills], line, sizeof(skills[numSkills]) - 1);
+                    skills[numSkills][strlen(skills[numSkills]) - 1] = '\0'; // Odstranění nového řádku
+                    numSkills++;
+                }
+
+                fclose(file);
+
+                // Výběr náhodných schopností
+                srand(time(NULL));
+                for (int i = 0; i < maxSkills; i++)
+                {
+                    int randomIndex = rand() % numSkills;
+                    printf("%d. %s\n", i + 1, skills[randomIndex]);
+                }
+
+                // Zde by hráč mohl vybrat speciální schopnost a provést příslušné akce
+            }
+            else
+            {
+                printf("Error: Failed to open specials.txt\n");
+            }
+        }
+
         system("pause");
         system("cls");
     }
 }
 void CreateScore()
 {
-    char filepath[100];
-    sprintf(filepath, "score/%s.txt", nickname);
-    FILE *file = fopen(filepath, "w");
-    fprintf(file, "Level: %d\n", self.lvl);
-    fprintf(file, "Total Experience: %d\n", self.totalexp);
-    fprintf(file, "Total Gold: %d\n", self.totalgold);
+    FILE *file = fopen("score.txt", "a");
+    float totalscore = ((float)self.totalexp + (float)self.totalgold) * (1 + ((float)self.lvl / 10));
+    fprintf(file, "%s: %.1f\n", nickname, totalscore);
     fclose(file);
 }
 void End()
 {
     if (self.hp <= 0)
     {
+        system("cls");
         printf("It's Game Over for %s!\n", nickname);
         printf("You reached level %d!\n", self.lvl);
         printf("You gained a total of %d exp and %d gold!\n", self.totalexp, self.totalgold);
@@ -425,7 +562,7 @@ void End()
         CreateScore();
         exit(0);
     }
-}
+} 
 void Generate_map()
 {
     int biome_size = 0;
@@ -485,10 +622,19 @@ void Generate_map()
             }
         }
     }
+    
+}
+void SetCursorPosition(int x, int y)
+{
+    COORD coordinates;
+    coordinates.X = x;
+    coordinates.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coordinates);
 }
 
 void Print_map()
 {
+    SetCursorPosition(0, 0);
     for (i = 0; i < SIZE_Y; i++)
     {
         for (j = 0; j < SIZE_X; j++)
@@ -589,6 +735,7 @@ void MoveUpdate()
         printf("You gained %d MANA!\n", managain);
         printf("\033[0m");
         Sleep(2000);
-        system("cls");
+        printf("\033[3A");
+        printf("\033[0J");
     }
 }

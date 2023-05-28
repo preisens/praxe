@@ -4,7 +4,10 @@
 #include <unistd.h>
 #include <conio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <dirent.h>
+
 
 
 void Welcome();
@@ -16,6 +19,8 @@ char* getRandomMonster(const char* folderPath);
 void StartPlayer();
 
 void Combat();
+
+int compare_scores(const void *a, const void *b); 
 
 void levelUp();
 
@@ -30,6 +35,7 @@ void Print_map();
 void MoveControl();
 
 void MoveUpdate();
+void SetCursorPosition(int x, int y);
 
 
 
