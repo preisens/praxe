@@ -847,7 +847,6 @@ void shop()
 {
     char koupe;
 
-
     printf("Welcome to shop \n");
     Sleep(500);
     printf("This is what we offer\n\n");
@@ -857,89 +856,92 @@ void shop()
     do
     {
 
-    printf("1) HEALTH POTION - 30 gold \n");
-    printf("gives you 25 hp \n\n");
+        printf("1) HEALTH POTION - 30 gold \n");
+        printf("gives you 25 hp \n\n");
 
-    printf("2) MANA POTION - 30 gold \n");
-    printf("gives you 30 mana power \n\n");
+        printf("2) MANA POTION - 30 gold \n");
+        printf("gives you 30 mana power \n\n");
 
-    printf("Press q to leave \n");
+        printf("Press q to leave \n");
 
-    koupe=getch();
+        koupe = getch();
 
-    if(koupe=='1')
-    {
-        if(self.gold>=30)
+        if (koupe == '1')
         {
-            self.gold=self.gold-30;
-            printf("\n");
-            printf("you spent 30 gold on health potion \n");
-            UpdateItemNumber("health potion");
-            Sleep(1200);
-            system("cls");
+            if (self.gold >= 30)
+            {
+                self.gold = self.gold - 30;
+                printf("\n");
+                printf("you spent 30 gold on health potion \n");
+                UpdateItemNumber("health potion");
+                Sleep(1200);
+                system("cls");
+            }
+            else
+            {
+                printf("\n");
+                printf("you are too poor :( \n");
+                Sleep(1200);
+                system("cls");
+            }
         }
-        else
+
+        if (koupe == '2')
         {
-            printf("\n");
-            printf("you are too poor :( \n");
-            Sleep(1200);
-            system("cls");
+            if (self.gold >= 30)
+            {
+                self.gold = self.gold - 30;
+                printf("\n");
+                printf("you spent 30 gold on mana potion \n");
+                UpdateItemNumber("mana potion");
+                Sleep(1200);
+                system("cls");
+            }
+            else
+            {
+                printf("\n");
+                printf("you are too poor :( \n");
+                Sleep(1200);
+                system("cls");
+            }
         }
-    }
 
-    if(koupe=='2')
-    {
-        if(self.gold>=30)
-        {
-            self.gold=self.gold-30;
-            printf("\n");
-            printf("you spent 30 gold on mana potion \n");
-            UpdateItemNumber("mana potion");
-            Sleep(1200);
-            system("cls");
-        }
-        else
-        {
-            printf("\n");
-            printf("you are too poor :( \n");
-            Sleep(1200);
-            system("cls");
-        }
-    }
+        system("cls");
 
-    system("cls");
-
-    }while(koupe!='q');
-
+    } while (koupe != 'q');
 }
 
-void PrintItems() 
+void PrintItems()
 {
-    FILE* file = fopen("items.txt", "r");
-    if (file == NULL) {
+    FILE *file = fopen("items.txt", "r");
+    if (file == NULL)
+    {
         printf("Failed to open the file.\n");
         return;
     }
 
     int ch;
-    while ((ch = fgetc(file)) != EOF) {
+    while ((ch = fgetc(file)) != EOF)
+    {
         putchar(ch);
     }
 
-    if (ferror(file)) {
+    if (ferror(file))
+    {
         printf("Error occurred while reading the file.\n");
     }
 
     fclose(file);
 }
 
-
-void UpdateItemNumber(const char* itemName) {
-    const char* filePath = "items.txt";
+void UpdateItemNumber(const char *itemName)
+{
+    const char *filePath = "items.txt";
 
     // Read the contents of the file
-    FILE* file = fopen(filePath, "r");
-    if (file == NULL) {
+    FILE *file = fopen(filePath, "r");
+    if (file == NULL)
+    {
         printf("Failed to open the file.\n");
         return;
     }
@@ -948,9 +950,11 @@ void UpdateItemNumber(const char* itemName) {
     char modifiedContent[500] = "";
     int foundItem = 0;
 
-    while (fgets(line, sizeof(line), file)) {
+    while (fgets(line, sizeof(line), file))
+    {
         // Check if the line contains the specified item name
-        if (strstr(line, itemName) != NULL) {
+        if (strstr(line, itemName) != NULL)
+        {
             foundItem = 1;
 
             // Extract the item ID and quantity from the line
@@ -966,7 +970,9 @@ void UpdateItemNumber(const char* itemName) {
 
             // Append the modified line to the content string
             strcat(modifiedContent, modifiedLine);
-        } else {
+        }
+        else
+        {
             // Append the original line to the content string
             strcat(modifiedContent, line);
         }
@@ -974,14 +980,16 @@ void UpdateItemNumber(const char* itemName) {
 
     fclose(file);
 
-    if (!foundItem) {
+    if (!foundItem)
+    {
         printf("Item not found in the file.\n");
         return;
     }
 
     // Write the modified contents back to the file
     file = fopen(filePath, "w");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Failed to open the file for writing.\n");
         return;
     }
@@ -989,22 +997,24 @@ void UpdateItemNumber(const char* itemName) {
     fputs(modifiedContent, file);
 
     fclose(file);
-
 }
 
-void ResetItems() {
-    const char* filePath = "items.txt";
-    const char* resetLines[] = {"broken sword", "broken armor", "broken shield"};
+void ResetItems()
+{
+    const char *filePath = "items.txt";
+    const char *resetLines[] = {"broken sword", "broken armor", "broken shield"};
 
     // Open the file for writing
-    FILE* file = fopen(filePath, "w");
-    if (file == NULL) {
+    FILE *file = fopen(filePath, "w");
+    if (file == NULL)
+    {
         printf("Failed to open the file.\n");
         return;
     }
 
     // Write the new lines for the first three items
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         fprintf(file, "%s\n", resetLines[i]);
     }
 
@@ -1012,13 +1022,11 @@ void ResetItems() {
     fprintf(file, "\n1) health potion 0\n2) mana potion 0\n");
 
     fclose(file);
-
 }
 
 void UsePotion()
 {
     char input;
-
 
     do
     {
@@ -1026,109 +1034,114 @@ void UsePotion()
         PrintItems();
         printf("\n");
         printf("press q to leave \n");
-        input=getch();
+        input = getch();
 
-        if(input=='1' || input=='2')
+        if (input == '1' || input == '2')
         {
             DecreaseItemCount(input);
+            printf("\033[2A");
+            printf("\033[0J");
+
         }
 
-        printf("\033[12A");
+        printf("\033[10A");
         printf("\033[0J");
 
-        
-
-
-    } while (input!='q');
-    
+    } while (input != 'q');
 }
-
-
 
 void DecreaseItemCount(char input)
 {
     FILE *file, *tempFile;
-    int ccount=0;
+    int ccount = 0;
     const char *filename = "items.txt";
     const char *tempFilename = "temp_items.txt";
     const int bufferSize = 100;
     char buffer[bufferSize];
-    int itemID = input - '0';  // Convert input character to integer ID
+    int itemID = input - '0'; // Convert input character to integer ID
 
     // Open the original file for reading
     file = fopen(filename, "r");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Failed to open the file %s\n", filename);
         return;
     }
 
     // Create a temporary file for writing
     tempFile = fopen(tempFilename, "w");
-    if (tempFile == NULL) {
+    if (tempFile == NULL)
+    {
         printf("Failed to create the temporary file %s\n", tempFilename);
         fclose(file);
         return;
     }
 
     // Copy the first 3 lines from the original file to the temporary file
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         fgets(buffer, bufferSize, file);
         fputs(buffer, tempFile);
     }
 
     // Find and update the item ccount
     int currentItemID;
-    while (fgets(buffer, bufferSize, file) != NULL) {
-        if (sscanf(buffer, "%d) ", &currentItemID) == 1 && currentItemID == itemID) {
+    while (fgets(buffer, bufferSize, file) != NULL)
+    {
+        if (sscanf(buffer, "%d) ", &currentItemID) == 1 && currentItemID == itemID)
+        {
             char itemName[bufferSize];
             sscanf(buffer, "%*d) %[^0-9] %d", itemName, &ccount);
 
-        if(input=='1' && ccount!=0)
-    {
-        printf("\n");
-        printf("you drunk health potion and got 25 HP \n");
-        Sleep(1100);
-        self.hp=self.hp+25;
-        if(self.hp>self.maxhp)
-        {
-            self.hp=self.maxhp;
-        }
-        
-    }
-    else if(input=='2' && ccount!=0) 
-    {
-        printf("\n");
-        printf("you drunk health potion and got 30 mana power \n");
-        Sleep(1100);
-        self.mana=self.mana+30;
-        if(self.mana>self.maxmana)
-        {
-            self.mana=self.maxmana;
-        }
+            if (input == '1' && ccount != 0)
+            {
+                printf("\n");
+                printf("you drunk health potion and got 25 HP \n");
+                Sleep(1100);
+                self.hp = self.hp + 25;
+                if (self.hp > self.maxhp)
+                {
+                    self.hp = self.maxhp;
+                }
+            }
+            else if (input == '2' && ccount != 0)
+            {
+                printf("\n");
+                printf("you drunk health potion and got 30 mana power \n");
+                Sleep(1100);
+                self.mana = self.mana + 30;
+                if (self.mana > self.maxmana)
+                {
+                    self.mana = self.maxmana;
+                }
+            }
 
-    }
-
-            if (ccount > 0) {
+            if (ccount > 0)
+            {
                 ccount--;
                 fprintf(tempFile, "%d) %s%d\n", itemID, itemName, ccount);
-            } else {
-                fprintf(tempFile, "%d) %s%d\n", itemID, itemName, ccount);  // Write the line as is
             }
-        } else {
-            fprintf(tempFile, "%s", buffer);  // Write other lines as is
+            else
+            {
+                fprintf(tempFile, "%d) %s%d\n", itemID, itemName, ccount); // Write the line as is
+            }
+        }
+        else
+        {
+            fprintf(tempFile, "%s", buffer); // Write other lines as is
         }
     }
 
     fclose(file);
     fclose(tempFile);
     // Replace the original file with the temporary file
-    if (remove(filename) != 0) {
+    if (remove(filename) != 0)
+    {
         printf("Failed to remove the original file %s\n", filename);
         return;
     }
-    if (rename(tempFilename, filename) != 0) {
+    if (rename(tempFilename, filename) != 0)
+    {
         printf("Failed to rename the temporary file\n");
     }
-
-
 }
