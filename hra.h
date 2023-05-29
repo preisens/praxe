@@ -37,7 +37,21 @@ void Print_map();
 void MoveControl();
 
 void MoveUpdate();
+
 void SetCursorPosition(int x, int y);
+
+void PrintItems();
+
+void UsePotion();
+
+void ResetItems();
+
+void UpdateItemNumber(const char* itemName);
+
+void shop();
+
+void DecreaseItemCount(char input);
+
 
 
 
