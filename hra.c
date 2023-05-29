@@ -11,7 +11,7 @@ char Controller = 'V';
 int x = 10;
 int y = 10;
 int option = 1;
-int keyPressed;
+char keyPressed;
 
 typedef struct
 {
@@ -124,33 +124,29 @@ void Menu()
     {
         system("cls");
         printf("What do you want to do?\n");
-        printf("1......... Explore%s\n", (option == 1) ? " <--" : "");
-        printf("2......... Status/Inventory%s\n", (option == 2) ? " <--" : "");
-        printf("3......... Shop%s\n", (option == 3) ? " <--" : "");
-        printf("4......... Leaderboard%s\n", (option == 4) ? " <--" : "");
-        printf("5......... Exit%s\n", (option == 5) ? " <--" : "");
+        printf("-Explore%s\n", (option == 1) ? " <--" : "");
+        printf("-Status/Inventory%s\n", (option == 2) ? " <--" : "");
+        printf("-Shop%s\n", (option == 3) ? " <--" : "");
+        printf("-Leaderboard%s\n", (option == 4) ? " <--" : "");
+        printf("-Exit%s\n", (option == 5) ? " <--" : "");
 
         keyPressed = getch();
 
-        if (keyPressed == 224) // Arrow keys
+        if (keyPressed == 'w')
         {
-            keyPressed = getch(); // Read the arrow key code
-
-            if (keyPressed == 72) // Up arrow
-            {
-                if (option > 1)
-                    option--;
-                else
-                    option = totalOptions;
-            }
-            else if (keyPressed == 80) // Down arrow
-            {
-                if (option < totalOptions)
-                    option++;
-                else
-                    option = 1;
-            }
+            if (option > 1)
+                option--;
+            else
+                option = totalOptions;
         }
+        else if (keyPressed == 's')
+        {
+            if (option < totalOptions)
+                option++;
+            else
+                option = 1;
+        }
+
         else // Other keys
         {
             switch (option)
@@ -325,37 +321,67 @@ void Combat()
     FILE *file = fopen(filePath, "r");
 
     int c;
+
+    if (boss % 5 == 0 && boss != 0)
+        printf("\033[0;31m");
+
     while ((c = fgetc(file)) != EOF)
     {
         putchar(c);
     }
-
+    printf("\033[0m");
     fclose(file);
     free(nameWithoutExtension);
-
+    free(filePath);
+    int totalOptions = 5;
     while (monster.hp > 0 && self.hp > 0)
     {
-        printf("-----------------------------------------------------------------\n");
-        printf("\t\t\tENEMY STATS\t\t\t\t|\n");
-        printf("-----------------------------------------------------------------\n");
-        printf("\tHP: %d/%d\n", monster.hp, monster.maxhp);
-        printf("-----------------------------------------------------------------\n");
-        printf("\t\t\tYOUR STATS\t\t\t\t|\n");
-        printf("-----------------------------------------------------------------\n");
-        printf("\tHP: %d/%d\tMANA: %d/%d\tARMOR: %d\tDMG: %d\n", self.hp, self.maxhp, self.mana, self.maxmana, self.armor, self.dmg + self.weapondmg);
-        printf("\nWhat do you want to do?\n");
-        printf("1......... Attack\n");
-        printf("2......... Skills\n");
-        printf("3......... Defend\n");
-        printf("4......... Inventory\n");
-        printf("5......... Run\n");
-        char choice = getch();
+        while (1)
+        {
+            printf("-----------------------------------------------------------------\n");
+            printf("\t\t\tENEMY STATS\t\t\t\t|\n");
+            printf("-----------------------------------------------------------------\n");
+            printf("\tHP: %d/%d\n", monster.hp, monster.maxhp);
+            printf("-----------------------------------------------------------------\n");
+            printf("\t\t\tYOUR STATS\t\t\t\t|\n");
+            printf("-----------------------------------------------------------------\n");
+            printf("\tHP: %d/%d\tMANA: %d/%d\tARMOR: %d\tDMG: %d\n", self.hp, self.maxhp, self.mana, self.maxmana, self.armor, self.dmg + self.weapondmg);
+            printf("\nWhat do you want to do?\n");
+            printf("-Attack%s\n", (option == 1 ? " <--" : ""));
+            printf("-Skills%s\n", (option == 2 ? " <--" : ""));
+            printf("-Defend%s\n", (option == 3 ? " <--" : ""));
+            printf("-Inventory%s\n", (option == 4 ? " <--" : ""));
+            printf("-Run%s\n", (option == 5 ? " <--" : ""));
+            keyPressed = getch();
+            if (keyPressed == 'w')
+            {
+                option--;
+                if (option < 1)
+                {
+                    option = totalOptions;
+                }
+            }
+            else if (keyPressed == 's')
+            {
+                option++;
+                if (option > totalOptions)
+                {
+                    option = 1;
+                }
+            }
+
+            else
+                break;
+            printf("\033[15A");
+            printf("\033[0J");
+        }
+
         printf("\033[6A");
         printf("\033[0J");
         self.totaldmg = self.dmg + self.weapondmg + rand() % 16 + 0;
-        switch (choice)
+        switch (option)
         {
-        case '1':
+        case 1:
         {
             printf("You chose to attack!\n");
             printf("You dealt %d damage to the monster!\n", self.totaldmg);
@@ -365,27 +391,73 @@ void Combat()
             printf("\033[0J");
         }
         break;
-        case '2':
+        case 2:
         {
-            printf("You chose to use a skill!\n");
-            printf("1.......... Normal skills\n");
-            printf("2.......... Special skills\n");
-            char skill = getch();
-            printf("\033[3A");
-            printf("\033[0J");
-            switch (skill)
+            int totaloptions = 2;
+            int option = 1;
+            while (1)
             {
-            case '1':
-            {
-                printf("1.......... Fireball\n");
-                printf("2.......... Icebolt\n");
-                printf("3.......... Lightning\n");
-                char normal = getch();
+                printf("You chose to use a skill!\n");
+                printf("-Normal skills%s\n", (option == 1 ? " <--" : ""));
+                printf("-Special skills%s\n", (option == 2 ? " <--" : ""));
+                keyPressed = getch();
+                if (keyPressed == 'w')
+                {
+                    option--;
+                    if (option < 1)
+                    {
+                        option = totaloptions;
+                    }
+                }
+                else if (keyPressed == 's')
+                {
+                    option++;
+                    if (option > totaloptions)
+                    {
+                        option = 1;
+                    }
+                }
+                else
+                    break;
                 printf("\033[3A");
                 printf("\033[0J");
-                switch (normal)
+            }
+            switch (option)
+            {
+            case 1:
+            {
+                while (1)
                 {
-                case '1':
+                    printf("\033[3A");
+                    printf("\033[0J");
+                    printf("-Fireball%s\n", (option == 1 ? " <--" : ""));
+                    printf("-Icebolt%s\n", (option == 2 ? " <--" : ""));
+                    printf("-Lightning%s\n", (option == 3 ? " <--" : ""));
+                    keyPressed = getch();
+                    if (keyPressed == 'w')
+                    {
+                        option--;
+                        if (option < 1)
+                        {
+                            option = 3;
+                        }
+                    }
+                    else if (keyPressed == 's')
+                    {
+                        option++;
+                        if (option > 3)
+                        {
+                            option = 1;
+                        }
+                    }
+                    else
+                        break;
+                }
+                printf("\033[3A");
+                printf("\033[0J");
+                switch (option)
+                {
+                case 1:
                 {
                     if (self.mana < 10)
                     {
@@ -399,7 +471,7 @@ void Combat()
                     self.mana -= 10;
                 }
                 break;
-                case '2':
+                case 2:
                 {
                     if (self.mana < 15)
                     {
@@ -413,7 +485,7 @@ void Combat()
                     self.mana -= 15;
                 }
                 break;
-                case '3':
+                case 3:
                 {
                     if (self.mana < 20)
                     {
@@ -430,7 +502,7 @@ void Combat()
                 }
             }
             break;
-            case '2':
+            case 2:
             {
             }
             break;
@@ -444,7 +516,7 @@ void Combat()
             printf("\033[0J");
         }
         break;
-        case '3':
+        case 3:
         {
             printf("You chose to defend!\n");
             self.defense = rand() % 31 + 20;
@@ -454,17 +526,18 @@ void Combat()
             printf("\033[0J");
         }
         break;
-        case '4':
+        case 4:
         {
         }
         break;
-        case '5':
+        case 5:
         {
             printf("You chose to run!\n");
             if (rand() % 2 == 0)
             {
                 printf("You have successfully ran away!\n");
                 system("pause");
+                system("cls");
                 return;
             }
             else
@@ -495,19 +568,13 @@ void Combat()
             printf("\033[2A");
             printf("\033[0J");
         }
-        if (monster.hp <= 0 || self.hp <= 0)
-        {
-            fclose(file);
-            free(filePath);
-            free(nameWithoutExtension);
-        }
         printf("\033[10A");
         printf("\033[0J");
     }
     if (self.hp > 0)
     {
         system("cls");
-        printf("\nYou have defeated the monster!\n");
+        printf("You have defeated the monster!\n");
         printf("You gained %d gold and %d exp!\n", monster.gold, monster.exp);
         self.gold += monster.gold;
         self.exp += monster.exp;
