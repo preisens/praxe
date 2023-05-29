@@ -1,20 +1,21 @@
-#include <stdio.h>
 #include "hra.h"
 
-int main()
-{
-    int running=1;
-
-    Start();
+void main()
+{   
+    HWND console = GetConsoleWindow();
+    SetWindowLong(console, GWL_STYLE, GetWindowLong(console, GWL_STYLE) & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX);
+    ShowWindow(console, SW_MAXIMIZE);
+    
     
 
-    while(running)
-    {
-        Events();
-        Update();
-        Render();
+    Generate_map();
+
+    StartPlayer();
+
+    Welcome();
+
+    while(1)
+    {   
+        Menu();
     }
-
-
-    return 0;
 }
