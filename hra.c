@@ -3,7 +3,7 @@
 #define SIZE_Y 30
 #define SIZE_X 60
 #define MAX_SCORES 3
-
+int boss = 0;
 int Ecounter = 0;
 int i, j, k;
 int map[SIZE_Y][SIZE_X][2];
@@ -158,13 +158,17 @@ void Menu()
             case 1:
             {
                 system("cls");
-                while (Controller != 'q')
+                while (1)
                 {
 
                     levelUp();
                     Print_map();
                     MoveControl();
                     MoveUpdate();
+                    if (Controller == 'q')
+                    {
+                        break;
+                    }
                 }
             }
             break;
@@ -263,15 +267,37 @@ int compare_scores(const void *a, const void *b)
 void Combat()
 {
     srand(time(NULL));
-    FILE *f;
     // open a random .txt file from the folder enemies
-    int enemy = rand() % 4 + 1;
-    monster.maxhp = rand() % 81 + 10;
+    if (boss % 5 == 0 && boss != 0)
+    {
+        monster.maxhp = rand() % 201 + 100;
+        monster.dmg = rand() % 31 + 70;
+    }
+    else
+    {
+        monster.maxhp = rand() % 81 + 10;
+        monster.dmg = rand() % 31 + 20;
+    }
+
     monster.hp = monster.maxhp;
-    monster.dmg = rand() % 31 + 20;
-    monster.exp = monster.maxhp + monster.dmg;
+
+    monster.exp = (monster.maxhp + monster.dmg) * 2;
     monster.gold = monster.exp / 2;
-    char *filePath = getRandomMonster("enemies");
+    char biomepath[50];
+    if (map[y][x][0] == 1)
+    {
+        strcpy(biomepath, "enemies/plains");
+    }
+    else if (map[y][x][0] == 2)
+    {
+        strcpy(biomepath, "enemies/forest");
+    }
+    else if (map[y][x][0] == 4)
+    {
+        strcpy(biomepath, "enemies/mountains");
+    }
+
+    char *filePath = getRandomMonster(biomepath);
     char *fileName = strrchr(filePath, '/');
     if (fileName == NULL)
     {
@@ -281,21 +307,34 @@ void Combat()
     {
         fileName++;
     }
-    char *nameWithoutExtension = malloc(strlen(fileName) - 3);
+
+    char *nameWithoutExtension = malloc(strlen(fileName) - 3 + 1);
     strncpy(nameWithoutExtension, fileName, strlen(fileName) - 4);
     nameWithoutExtension[strlen(fileName) - 4] = '\0';
-
-    printf("You encountered a %s!\n", nameWithoutExtension);
+    if (boss % 5 == 0 && boss != 0)
+    {
+        printf("You encountered a BOSS %s!\n", nameWithoutExtension);
+    }
+    else
+    {
+        printf("You encountered a %s!\n", nameWithoutExtension);
+    }
     system("pause");
     system("cls");
+
+    FILE *file = fopen(filePath, "r");
+
+    int c;
+    while ((c = fgetc(file)) != EOF)
+    {
+        putchar(c);
+    }
+
+    fclose(file);
+    free(nameWithoutExtension);
+
     while (monster.hp > 0 && self.hp > 0)
     {
-        FILE *file = fopen(filePath, "r");
-        int c;
-        while ((c = fgetc(file)) != EOF)
-        {
-            putchar(c);
-        }
         printf("-----------------------------------------------------------------\n");
         printf("\t\t\tENEMY STATS\t\t\t\t|\n");
         printf("-----------------------------------------------------------------\n");
@@ -456,18 +495,19 @@ void Combat()
             printf("\033[2A");
             printf("\033[0J");
         }
-
-        system("cls");
         if (monster.hp <= 0 || self.hp <= 0)
         {
             fclose(file);
             free(filePath);
             free(nameWithoutExtension);
         }
+        printf("\033[10A");
+        printf("\033[0J");
     }
     if (self.hp > 0)
     {
-        printf("You have defeated the monster!\n");
+        system("cls");
+        printf("\nYou have defeated the monster!\n");
         printf("You gained %d gold and %d exp!\n", monster.gold, monster.exp);
         self.gold += monster.gold;
         self.exp += monster.exp;
@@ -562,7 +602,7 @@ void End()
         CreateScore();
         exit(0);
     }
-} 
+}
 void Generate_map()
 {
     int biome_size = 0;
@@ -622,7 +662,6 @@ void Generate_map()
             }
         }
     }
-    
 }
 void SetCursorPosition(int x, int y)
 {
@@ -708,10 +747,18 @@ void MoveUpdate()
     Ecounter = rand() % 100 + 1;
     if (Ecounter >= 1 && Ecounter <= 30 && Controller != 'q')
     {
+        boss++;
         printf("\033[0;31m");
-        printf("\na monster attacked you!\n");
+        if (boss % 5 == 0 && boss != 0)
+        {
+            printf("\nA BOSS MONSTER ATTACKED YOU!!!\n");
+        }
+        else
+        {
+            printf("\nA monster attacked you!\n");
+        }
         printf("\033[0m");
-        Sleep(1000);
+        Sleep(2000);
         system("cls");
         Combat();
     }
