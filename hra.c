@@ -404,6 +404,7 @@ void Combat()
         break;
         case '4':
         {
+            UsePotion();
         }
         break;
         case '5':
@@ -918,7 +919,10 @@ void UsePotion()
             DecreaseItemCount(input);
         }
 
-        system("cls");
+        printf("\033[12A");
+        printf("\033[0J");
+
+        
 
 
     } while (input!='q');
@@ -971,7 +975,11 @@ void DecreaseItemCount(char input)
         printf("you drunk health potion and got 25 HP \n");
         Sleep(1100);
         self.hp=self.hp+25;
-        system("cls");
+        if(self.hp>self.maxhp)
+        {
+            self.hp=self.maxhp;
+        }
+        
     }
     else if(input=='2' && ccount!=0) 
     {
@@ -979,7 +987,11 @@ void DecreaseItemCount(char input)
         printf("you drunk health potion and got 30 mana power \n");
         Sleep(1100);
         self.mana=self.mana+30;
-        system("cls");
+        if(self.mana>self.maxmana)
+        {
+            self.mana=self.maxmana;
+        }
+
     }
 
             if (ccount > 0) {
