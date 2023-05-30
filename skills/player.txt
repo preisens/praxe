@@ -1,0 +1,3 @@
+Earthquake 40 80
+Thunderstrike 25 60
+ 0 0

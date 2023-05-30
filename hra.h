@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <limits.h>
+#include <stdbool.h>
 
 
 
@@ -51,6 +52,11 @@ void UpdateItemNumber(const char* itemName);
 void shop();
 
 void DecreaseItemCount(char input);
+
+void readSkills();
+
+void printRandomSkills();
+
 
 
 

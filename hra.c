@@ -4,6 +4,15 @@
 #define SIZE_X 60
 #define MAX_SCORES 3
 int boss = 0;
+#define MAX_SKILLS 100
+#define MAX_LENGTH 50
+
+typedef struct
+{
+    char skillname[MAX_LENGTH];
+    int manacost;
+    int damage;
+} Skill;
 int Ecounter = 0;
 int i, j, k;
 int map[SIZE_Y][SIZE_X][2];
@@ -253,8 +262,8 @@ void Combat()
     // open a random .txt file from the folder enemies
     if (boss % 5 == 0 && boss != 0)
     {
-        monster.maxhp = rand() % 201 + 100;
-        monster.dmg = rand() % 31 + 70;
+        monster.maxhp = rand() % 81 + 100;
+        monster.dmg = rand() % 31 + 50;
     }
     else
     {
@@ -454,6 +463,9 @@ void Combat()
                     }
                     printf("You used Fireball!\n");
                     printf("You dealt %d damage to the monster!\n", self.totaldmg + 5);
+                    system("pause");
+                    printf("\033[3A");
+                    printf("\033[0J");
                     monster.hp -= self.totaldmg + 5;
                     self.mana -= 10;
                 }
@@ -468,6 +480,9 @@ void Combat()
                     }
                     printf("You used Icebolt!\n");
                     printf("You dealt %d damage to the monster!\n", self.totaldmg + 10);
+                    system("pause");
+                    printf("\033[3A");
+                    printf("\033[0J");
                     monster.hp -= self.totaldmg + 10;
                     self.mana -= 15;
                 }
@@ -482,6 +497,9 @@ void Combat()
                     }
                     printf("You used Lightning!\n");
                     printf("You dealt %d damage to the monster!\n", self.totaldmg + 15);
+                    system("pause");
+                    printf("\033[3A");
+                    printf("\033[0J");
                     monster.hp -= self.totaldmg + 15;
                     self.mana -= 20;
                 }
@@ -491,6 +509,71 @@ void Combat()
             break;
             case 2:
             {
+                // open the file player.txt and read the skills
+                printf("\033[3A");
+                printf("\033[0J");
+                Skill skills[MAX_SKILLS];
+                char filename[] = "skills/player.txt";
+                FILE *file = fopen(filename, "r");
+                int numSkills = 0;
+                char line[MAX_LENGTH];
+                while (fgets(line, sizeof(line), file) != NULL && numSkills < MAX_SKILLS)
+                {
+                    sscanf(line, "%s %d %d", skills[numSkills].skillname, &skills[numSkills].manacost, &skills[numSkills].damage);
+                    numSkills++;
+                }
+
+                fclose(file);
+
+                srand(time(NULL)); // Seed the random number generator with the current time
+
+                if (numSkills > 0)
+                {
+                    // Print the available skills from player.txt
+                    printf("Special Skills:\n");
+                    for (int i = 0; i < numSkills; i++)
+                    {
+                        printf("%d. Skill Name: %s\n", i + 1, skills[i].skillname);
+                        printf("   Mana Cost: %d\n", skills[i].manacost);
+                        printf("   Damage: %d\n", skills[i].damage);
+                        printf("\n");
+                    }
+
+                    // Player chooses a skill
+                    int choice;
+                    printf("Choose a skill (1-%d): ", numSkills);
+                    scanf("%d", &choice);
+
+                    if (choice >= 1 && choice <= numSkills)
+                    {
+                        int index = choice - 1;
+                        Skill chosenSkill = skills[index];
+
+                        if (self.mana < chosenSkill.manacost)
+                        {
+                            printf("The skill didn't work!\n");
+                            printf("You don't have enough mana!\n");
+                            break;
+                        }
+                        printf("\033[%dA", (numSkills * 4) + 2);
+                        printf("\033[0J");
+                        printf("You used %s!\n", chosenSkill.skillname);
+                        printf("You dealt %d damage to the monster!\n", self.totaldmg + chosenSkill.damage);
+                        system("pause");
+                        monster.hp -= self.totaldmg + chosenSkill.damage;
+                        self.mana -= chosenSkill.manacost;
+                        printf("\033[2A");
+                        printf("\033[0J");
+                    }
+                    else
+                    {
+                        printf("Invalid choice.\n");
+                    }
+                }
+                else
+                {
+                    printf("You don't have any special skills\n");
+                }
             }
             break;
             }
@@ -498,9 +581,6 @@ void Combat()
             {
                 self.mana = 0;
             }
-            system("pause");
-            printf("\033[3A");
-            printf("\033[0J");
         }
         break;
         case 3:
@@ -574,6 +654,101 @@ void Combat()
     system("pause");
     system("cls");
 }
+Skill skills[MAX_SKILLS];
+int numSkills = 0;
+void readSkills()
+{
+    char filename[] = "skills/skills.txt";
+    FILE *file = fopen(filename, "r");
+    char line[MAX_LENGTH];
+    while (fgets(line, sizeof(line), file) != NULL && numSkills < MAX_SKILLS)
+    {
+        sscanf(line, "%s %d %d", skills[numSkills].skillname, &skills[numSkills].manacost, &skills[numSkills].damage);
+        numSkills++;
+    }
+
+    fclose(file);
+}
+void printRandomSkills()
+{
+    srand(time(NULL));
+    // print 3 random skills, don't generate the same skill twice
+    int selectedSkills[3] = {-1, -1, -1};
+    int selectedCount = 0;
+
+    while (selectedCount < 3)
+    {
+        int randomIndex = rand() % numSkills;
+
+        bool alreadySelected = false;
+        for (int i = 0; i < selectedCount; i++)
+        {
+            if (selectedSkills[i] == randomIndex)
+            {
+                alreadySelected = true;
+                break;
+            }
+        }
+
+        if (!alreadySelected)
+        {
+            selectedSkills[selectedCount] = randomIndex;
+            selectedCount++;
+        }
+    }
+
+    // Print the randomly selected skills
+    for (int i = 0; i < 3; i++)
+    {
+        int index = selectedSkills[i];
+        printf("%d. Skill Name: %s\n", i + 1, skills[index].skillname);
+        printf("   Mana Cost: %d\n", skills[index].manacost);
+        printf("   Damage: %d\n", skills[index].damage);
+        printf("\n");
+    }
+
+    // Player chooses a skill
+    int choice;
+    printf("Choose a skill (1-3): ");
+    scanf("%d", &choice);
+
+    if (choice >= 1 && choice <= 3)
+    {
+        int index = selectedSkills[choice - 1];
+        FILE *file = fopen("skills/player.txt", "a"); // Open the file in append mode
+        if (file == NULL)
+        {
+            printf("Failed to open file: player.txt\n");
+            return;
+        }
+        fprintf(file, "%s %d %d\n", skills[index].skillname, skills[index].manacost, skills[index].damage);
+
+        fclose(file);
+        printf("Skill added to player.txt\n");
+        // delete the skill from skills.txt
+        FILE *file2 = fopen("skills/skills.txt", "r");
+        FILE *file3 = fopen("skills/temp.txt", "w");
+        char line[MAX_LENGTH];
+        int count = 0;
+        while (fgets(line, sizeof(line), file2) != NULL)
+        {
+            if (count != index)
+            {
+                fprintf(file3, "%s", line);
+            }
+            count++;
+        }
+        fclose(file2);
+        fclose(file3);
+        remove("skills/skills.txt");
+        rename("skills/temp.txt", "skills/skills.txt");
+    }
+    else
+    {
+        printf("Invalid choice.\n");
+    }
+}
+
 void levelUp()
 {
     if (self.exp >= self.maxexp)
@@ -590,47 +765,10 @@ void levelUp()
         printf("You gained 10 max mana!\n");
         printf("You gained 5 damage!\n");
 
-        if (self.lvl % 3 == 0)
+        if (self.lvl % 3 == 0 && numSkills != 0)
         {
-            system("cls");
-            printf("Choose a special skill:\n");
-
-            // Načtení speciálních schopností ze souboru
-            FILE *file = fopen("skills/special.txt", "r");
-            if (file != NULL)
-            {
-                const int maxSkills = 3;
-                char skills[maxSkills][100]; // Max 100 znaků na řádek schopnosti
-
-                int numSkills = 0;
-                char line[100];
-                while (fgets(line, sizeof(line), file) != NULL)
-                {
-                    if (numSkills >= maxSkills)
-                    {
-                        break;
-                    }
-                    strncpy(skills[numSkills], line, sizeof(skills[numSkills]) - 1);
-                    skills[numSkills][strlen(skills[numSkills]) - 1] = '\0'; // Odstranění nového řádku
-                    numSkills++;
-                }
-
-                fclose(file);
-
-                // Výběr náhodných schopností
-                srand(time(NULL));
-                for (int i = 0; i < maxSkills; i++)
-                {
-                    int randomIndex = rand() % numSkills;
-                    printf("%d. %s\n", i + 1, skills[randomIndex]);
-                }
-
-                // Zde by hráč mohl vybrat speciální schopnost a provést příslušné akce
-            }
-            else
-            {
-                printf("Error: Failed to open specials.txt\n");
-            }
+            readSkills();
+            printRandomSkills();
         }
 
         system("pause");
@@ -1041,7 +1179,6 @@ void UsePotion()
             DecreaseItemCount(input);
             printf("\033[2A");
             printf("\033[0J");
-
         }
 
         printf("\033[10A");

@@ -1,0 +1,4 @@
+Heal 20 0
+Earthquake 40 80
+Thunderstrike 25 60
+Meditation 5 0

@@ -1,2 +1,7 @@
 kozak: 438.9
 asdasd: 287.1
+konali: 0.0
+nwm: 1326.0
+kouzlo: 25180.8
+dsad: 0.0
+no: 0.0
