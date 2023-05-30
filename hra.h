@@ -57,6 +57,8 @@ void readSkills();
 
 void printRandomSkills();
 
+void ResetSkills();
+
 
 
 

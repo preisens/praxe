@@ -1,2 +1,10 @@
-Heal 20 0
-Meditation 5 0
+Healing Hands,20,30,heal
+Earthquake,40,40,damage
+Thunderstrike,50,60,damage
+Meditation,5,25,heal
+Mana shield,10,40,defense
+Perma Death,100,1000,instakill
+Shadow Escape,80,0,escape
+Suicide,0,-1000,selfharm
+Protection Barrier,30,100,defense
+Goddess' help,90,150,heal
