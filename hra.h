@@ -52,6 +52,8 @@ void shop();
 
 void DecreaseItemCount(char input);
 
+void UpdateEquipment(char input);
+
 
 
 

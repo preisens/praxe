@@ -1,2 +1,1 @@
-kozak: 438.9
-asdasd: 287.1
+vojta: 1362.0

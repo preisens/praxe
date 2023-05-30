@@ -847,6 +847,8 @@ void shop()
 {
     char koupe;
 
+    self.gold=5000;
+
     printf("Welcome to shop \n");
     Sleep(500);
     printf("This is what we offer\n\n");
@@ -855,12 +857,64 @@ void shop()
 
     do
     {
+        printf("POTIONS \n \n");
 
         printf("1) HEALTH POTION - 30 gold \n");
         printf("gives you 25 hp \n\n");
 
         printf("2) MANA POTION - 30 gold \n");
         printf("gives you 30 mana power \n\n");
+
+        printf("ARMORS \n \n");
+
+        printf("3) LEATHER ARMOR - 50 \n");
+        printf("gives you 50 armor \n\n");
+
+        printf("4) IRON ARMOR - 100 \n");
+        printf("gives you 150 armor \n\n");
+
+        printf("5) STEEL ARMOR - 300 \n");
+        printf("gives you 300 armor \n\n");
+
+        printf("6) DRAGON ARMOR - 400 \n");
+        printf("gives you 400 armor \n\n");
+
+        printf("7) PLATINUM ARMOR - 569 \n");
+        printf("gives you 550 armor \n\n");
+
+        printf("SHIELDS \n \n");
+
+        printf("8) LEATHER SHIELD - 50 \n");
+        printf("gives you 50 armor \n\n");
+
+        printf("9) IRON SHIELD - 100 \n");
+        printf("gives you 150 armor \n\n");
+
+        printf("10) STEEL SHIELD - 300 \n");
+        printf("gives you 300 armor \n\n");
+
+        printf("11) DRAGON SHIELD - 400 \n");
+        printf("gives you 400 armor \n\n");
+
+        printf("12) PLATINUM SHIELD - 569 \n");
+        printf("gives you 550 armor \n\n");
+
+        printf("WEAPONS \n \n");
+
+        printf("13) WOODEN SWORD - 50 \n");
+        printf("gives you 25 damage \n\n");
+
+        printf("14) IRON SWORD - 100 \n");
+        printf("gives you 75 damage \n\n");
+
+        printf("15) STEEL SWORD - 300 \n");
+        printf("gives you 150 damage \n\n");
+
+        printf("16) DRAGON SWORD - 400 \n");
+        printf("gives you 200 damage \n\n");
+
+        printf("17) PLATINUM SWORD - 569 \n");
+        printf("gives you 275 damage \n\n");
 
         printf("Press q to leave \n");
 
@@ -904,6 +958,11 @@ void shop()
                 Sleep(1200);
                 system("cls");
             }
+        }
+
+        if(koupe=='3' || koupe=='4' || koupe=='5' || koupe=='6' || koupe=='7' || koupe=='8' || koupe=='9' || koupe=='10' || koupe=='11' || koupe=='12' || koupe=='13' || koupe=='14' || koupe=='15' || koupe=='16' || koupe=='17')
+        {
+            UpdateEquipment(koupe);
         }
 
         system("cls");
@@ -1143,5 +1202,102 @@ void DecreaseItemCount(char input)
     if (rename(tempFilename, filename) != 0)
     {
         printf("Failed to rename the temporary file\n");
+    }
+}
+
+void UpdateEquipment(char input) {
+    int lineCount = 0;  // Start lineCount from 0
+    char line[256];   // Buffer to store each line
+    char* token;      // Used for tokenizing the line
+    char name[20];
+    char tool[20];
+    int price;
+    int value;
+    char function[20];
+    char temp[256];   // Increased buffer size to handle longer lines
+
+    FILE* file = fopen("shop_items.txt", "r");
+    if (file == NULL) {
+        printf("Failed to open the file.\n");
+        return;
+    }
+
+    int targetLine = input - '0';
+
+    while (fgets(line, sizeof(line), file) != NULL) {
+        lineCount++;
+        if (lineCount == targetLine) {
+            char tempLine[256];  // Buffer to store the tokenized line
+            strcpy(tempLine, line);  // Copy the line to tempLine before tokenizing
+
+            token = strtok(tempLine, " \t");  // Tokenize the line using space and tab as delimiters
+
+            // Extract the values based on their positions
+            strcpy(name, token);
+            token = strtok(NULL, " \t");
+            strcpy(tool, token);
+            token = strtok(NULL, " \t");
+            price = atoi(token);
+            token = strtok(NULL, " \t");
+            value = atoi(token);
+            token = strtok(NULL, " \t");
+            strcpy(function, token);
+
+            printf("Line %d: Name: %s Tool: %s Price: %d Value: %d Function: %s\n",
+                   lineCount, name, tool, price, value, function);
+            break;
+        }
+    }
+
+    fclose(file);
+
+    file = fopen("items.txt", "r+");
+    if (file == NULL) {
+        printf("Failed to open the file.\n");
+        return;
+    }
+
+    FILE* tempFile = fopen("temp.txt", "w");
+    if (tempFile == NULL) {
+        printf("Failed to create temporary file.\n");
+        fclose(file);
+        return;
+    }
+
+    // Read each line and compare the second word with "tool"
+    lineCount = 0;  // Reset lineCount
+    while (fgets(line, sizeof(line), file) != NULL) {
+        lineCount++;
+        if (lineCount == targetLine) {
+            char tempLine[256];  // Buffer to store the tokenized line
+            strcpy(tempLine, line);  // Copy the line to tempLine before tokenizing
+
+            token = strtok(tempLine, " ");  // assuming words are separated by a space
+
+            if (token != NULL) {
+                // If the second word is "tool," overwrite the line
+                if (strcmp(token, tool) == 0) {
+                    sprintf(temp, "%s %s\n", name, tool);
+                    fputs(temp, tempFile);
+                } else {
+                    fputs(line, tempFile);
+                }
+            }
+        } else {
+            fputs(line, tempFile);
+        }
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    // Replace the original file with the temporary file
+    if (remove("items.txt") != 0) {
+        printf("Failed to delete the original file.\n");
+        return;
+    }
+    if (rename("temp.txt", "items.txt") != 0) {
+        printf("Failed to rename the temporary file.\n");
+        return;
     }
 }

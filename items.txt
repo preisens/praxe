@@ -1,6 +1,6 @@
+broken shield
 broken sword
 broken armor
-broken shield
 
-1) health potion 0
-2) mana potion 0
+1)health potion 44
+2)mana potion 6
