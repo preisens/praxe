@@ -1,6 +1,6 @@
-broken shield
-broken sword
-broken armor
+steel armor
+iron shield
+iron sword
 
-1)health potion 44
-2)mana potion 6
+1) health potion 12
+2) mana potion 8

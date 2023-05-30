@@ -845,9 +845,7 @@ void MoveUpdate()
 
 void shop()
 {
-    char koupe;
-
-    self.gold=5000;
+    char koupe[4];
 
     printf("Welcome to shop \n");
     Sleep(500);
@@ -916,11 +914,11 @@ void shop()
         printf("17) PLATINUM SWORD - 569 \n");
         printf("gives you 275 damage \n\n");
 
-        printf("Press q to leave \n");
+        printf("Press q to leave \n\n");
 
-        koupe = getch();
+        scanf("%s",koupe);
 
-        if (koupe == '1')
+        if ((strcmp(koupe, "1")==0))
         {
             if (self.gold >= 30)
             {
@@ -940,7 +938,7 @@ void shop()
             }
         }
 
-        if (koupe == '2')
+        if ((strcmp(koupe, "2")==0))
         {
             if (self.gold >= 30)
             {
@@ -960,14 +958,14 @@ void shop()
             }
         }
 
-        if(koupe=='3' || koupe=='4' || koupe=='5' || koupe=='6' || koupe=='7' || koupe=='8' || koupe=='9' || koupe=='10' || koupe=='11' || koupe=='12' || koupe=='13' || koupe=='14' || koupe=='15' || koupe=='16' || koupe=='17')
+        if(strcmp(koupe, "3") == 0 || strcmp(koupe, "4") == 0 || strcmp(koupe, "5") == 0 || strcmp(koupe, "6") == 0 || strcmp(koupe, "7") == 0 || strcmp(koupe, "8") == 0 || strcmp(koupe, "9") == 0 || strcmp(koupe, "10") == 0 || strcmp(koupe, "11") == 0 || strcmp(koupe, "12") == 0 || strcmp(koupe, "13") == 0 || strcmp(koupe, "14") == 0 || strcmp(koupe, "15") == 0 || strcmp(koupe, "16") == 0 || strcmp(koupe, "17") == 0)
         {
             UpdateEquipment(koupe);
         }
 
         system("cls");
 
-    } while (koupe != 'q');
+    } while (strcmp(koupe, "q") != 0);
 }
 
 void PrintItems()
@@ -1205,16 +1203,16 @@ void DecreaseItemCount(char input)
     }
 }
 
-void UpdateEquipment(char input) {
-    int lineCount = 0;  // Start lineCount from 0
-    char line[256];   // Buffer to store each line
-    char* token;      // Used for tokenizing the line
+void UpdateEquipment(char input[4]) {
+    int lineCount = 0;
+    char line[256];
+    char* token;
     char name[20];
     char tool[20];
     int price;
     int value;
     char function[20];
-    char temp[256];   // Increased buffer size to handle longer lines
+    char temp[256];
 
     FILE* file = fopen("shop_items.txt", "r");
     if (file == NULL) {
@@ -1222,17 +1220,16 @@ void UpdateEquipment(char input) {
         return;
     }
 
-    int targetLine = input - '0';
+    int targetLine = atoi(input);
 
     while (fgets(line, sizeof(line), file) != NULL) {
         lineCount++;
         if (lineCount == targetLine) {
-            char tempLine[256];  // Buffer to store the tokenized line
-            strcpy(tempLine, line);  // Copy the line to tempLine before tokenizing
+            char tempLine[256];
+            strcpy(tempLine, line);
 
-            token = strtok(tempLine, " \t");  // Tokenize the line using space and tab as delimiters
+            token = strtok(tempLine, " \t");
 
-            // Extract the values based on their positions
             strcpy(name, token);
             token = strtok(NULL, " \t");
             strcpy(tool, token);
@@ -1243,61 +1240,94 @@ void UpdateEquipment(char input) {
             token = strtok(NULL, " \t");
             strcpy(function, token);
 
-            printf("Line %d: Name: %s Tool: %s Price: %d Value: %d Function: %s\n",
-                   lineCount, name, tool, price, value, function);
+            if(price>self.gold)
+            {
+                printf("you are too poor :( \n");
+                Sleep(1500);
+                return;
+            }
+
+            if(strcmp(tool,"armor")==0)
+            {
+                self.armor=value;
+            }
+            else if(strcmp(tool,"sword")==0)
+            {
+                self.weapondmg=value;
+            }
+            else if(strcmp(tool,"shield")==0)
+            {
+                self.defense=value;
+            }
+
+            printf("item bought \n");
+
             break;
         }
     }
 
     fclose(file);
 
-    file = fopen("items.txt", "r+");
+    file = fopen("items.txt", "r");
     if (file == NULL) {
         printf("Failed to open the file.\n");
+        sleep(3);
         return;
     }
 
-    FILE* tempFile = fopen("temp.txt", "w");
+    FILE* tempFile = fopen("temporary.txt", "w");
     if (tempFile == NULL) {
-        printf("Failed to create temporary file.\n");
+        printf("Failed to create the temporary file.\n");
+        sleep(3);
         fclose(file);
         return;
     }
 
-    // Read each line and compare the second word with "tool"
-    lineCount = 0;  // Reset lineCount
-    while (fgets(line, sizeof(line), file) != NULL) {
-        lineCount++;
-        if (lineCount == targetLine) {
-            char tempLine[256];  // Buffer to store the tokenized line
-            strcpy(tempLine, line);  // Copy the line to tempLine before tokenizing
+    int lineNum = 1;
+    int matchLineNum = -1;
+    char word1[100], word2[100];
 
-            token = strtok(tempLine, " ");  // assuming words are separated by a space
+    while (fgets(line, sizeof(line), file)) {
+        if (sscanf(line, "%s %s", word1, word2) == 2) {
+            if (strcmp(word2, tool) == 0)
+            {
 
-            if (token != NULL) {
-                // If the second word is "tool," overwrite the line
-                if (strcmp(token, tool) == 0) {
-                    sprintf(temp, "%s %s\n", name, tool);
-                    fputs(temp, tempFile);
-                } else {
-                    fputs(line, tempFile);
-                }
+                matchLineNum = lineNum;
             }
-        } else {
+        }
+        if (matchLineNum != lineNum) {
             fputs(line, tempFile);
         }
+        else if (matchLineNum == lineNum)
+        {
+            char concatenated[100];
+            strcpy(concatenated, name);
+            strcat(concatenated, " ");
+            strcat(concatenated, tool);
+            fputs(concatenated, tempFile);
+            fputs("\n",tempFile);
+        }
+        lineNum++;
     }
+
+
 
     fclose(file);
     fclose(tempFile);
 
-    // Replace the original file with the temporary file
-    if (remove("items.txt") != 0) {
+    if (remove("items.txt") == 0) {
+        printf("Original file deleted successfully.\n");
+    } else {
         printf("Failed to delete the original file.\n");
         return;
     }
-    if (rename("temp.txt", "items.txt") != 0) {
-        printf("Failed to rename the temporary file.\n");
+
+    if (rename("temporary.txt", "items.txt") == 0) {
+
+    } else {
+
         return;
     }
 }
+
+

@@ -22,7 +22,7 @@ void StartPlayer();
 
 void Combat();
 
-int compare_scores(const void *a, const void *b); 
+int compare_scores(const void *a, const void *b);
 
 void levelUp();
 
@@ -52,7 +52,7 @@ void shop();
 
 void DecreaseItemCount(char input);
 
-void UpdateEquipment(char input);
+void UpdateEquipment(char input[4]);
 
 
 
