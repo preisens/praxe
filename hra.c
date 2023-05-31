@@ -409,7 +409,7 @@ void Combat()
             {
                 // Print the available skills from player.txt
 
-                printf("Skills:\n");
+               printf("Skills:\n");
                 for (int i = 0; i < numSkills; i++)
                 {
                     printf("%d. Skill Name: %s\n", i + 1, skills[i].skillname);
@@ -434,9 +434,9 @@ void Combat()
                         printf("You don't have enough mana!\n");
                         break;
                     }
-                    printf("\033[%dA", (numSkills * 5) + 1);
+                    printf("\033[%dA",(numSkills * 5) + 1);
                     printf("\033[0J");
-                    printf("You chose to use %s!\n", chosenSkill.skillname);
+                    printf("%s!\n", chosenSkill.skillname);
                     if (strcmp(chosenSkill.type, "damage") == 0)
                     {
                         printf("You dealt %d damage to the monster!\n", self.totaldmg + chosenSkill.value);
@@ -459,12 +459,12 @@ void Combat()
                     }
                      else if (strcmp(chosenSkill.type, "escape") == 0)
                     {
-                        printf("You ran away!");
+                        printf("You ran away!\n");
                         return;
                     }
                     else if (strcmp(chosenSkill.type, "selfharm") == 0)
                     {
-                        printf("You... commited suicide?");
+                        printf("You... commited suicide?\n");
                         self.hp = 0;
                     }
                     system("pause");
@@ -577,6 +577,7 @@ void readSkills()
 }
 void printRandomSkills()
 {
+    system("cls");
     srand(time(NULL));
     // print 3 random skills, don't generate the same skill twice
 
@@ -686,8 +687,9 @@ void levelUp()
         printf("You gained 10 max mana!\n");
         printf("You gained 5 damage!\n");
 
-        if (self.lvl % 3 == 0 && numSkills != 0)
+        if (self.lvl % 3 == 0)
         {
+            system("pause");
             readSkills();
             printRandomSkills();
         }
@@ -701,6 +703,23 @@ void CreateScore()
     FILE *file = fopen("score.txt", "a");
     float totalscore = ((float)self.totalexp + (float)self.totalgold) * (1 + ((float)self.lvl / 10));
     fprintf(file, "%s: %.1f\n", nickname, totalscore);
+    fclose(file);
+}
+void ResetSkills()
+{
+    FILE *file = fopen("skills/player.txt", "w");
+    fprintf(file,"fireball,25,30,damage\n");
+    fclose(file);
+
+    file = fopen("skills/skills.txt", "w");
+    //copy the contents of skills_default.txt to skills.txt
+    FILE *file2 = fopen("skills/skills_default.txt", "r");
+    char line[MAX_LENGTH];
+    while (fgets(line, sizeof(line), file2) != NULL)
+    {
+        fprintf(file, "%s", line);
+    }
+    fclose(file2);
     fclose(file);
 }
 void End()
@@ -718,23 +737,6 @@ void End()
         ResetSkills();
         exit(0);
     }
-}
-void ResetSkills()
-{
-    FILE *file = fopen("items/player.txt", "w");
-    fprintf(file, "fireball,25,30,damage\n");
-    fclose(file);
-
-    file = fopen("items/items.txt", "w");
-    //copy the contents of skills_default.txt to skills.txt
-    FILE *file2 = fopen("items/items_default.txt", "r");
-    char line[MAX_LENGTH];
-    while (fgets(line, sizeof(line), file2) != NULL)
-    {
-        fprintf(file, "%s", line);
-    }
-    fclose(file2);
-    fclose(file);
 }
 void Generate_map()
 {
@@ -813,11 +815,11 @@ void Print_map()
         {
             if (map[i][j][0] == 1 && map[i][j][1] == 0)
             {
-                printf("\033[0;33mP ");
+                printf("\033[0;33m- ");
             }
             else if (map[i][j][0] == 2 && map[i][j][1] == 0)
             {
-                printf("\033[0;32mF ");
+                printf("\033[0;32mT ");
             }
             else if (map[i][j][0] == 3 && map[i][j][1] == 0)
             {
@@ -829,8 +831,7 @@ void Print_map()
             }
             else if (map[i][j][1] == 1)
             {
-                printf("\033[0;31m");
-                printf("\u25A0 ");
+                printf("\033[0;31mX ");
             }
         }
 
@@ -1044,7 +1045,7 @@ void UpdateItemNumber(const char *itemName)
 
             // Generate the modified line with the updated quantity
             char modifiedLine[100];
-            snprintf(modifiedLine, sizeof(modifiedLine), "%d)%s %d\n", id, itemName, quantity);
+            snprintf(modifiedLine, sizeof(modifiedLine), "%d) %s %d\n", id, itemName, quantity);
 
             // Append the modified line to the content string
             strcat(modifiedContent, modifiedLine);
