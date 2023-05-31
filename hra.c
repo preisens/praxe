@@ -934,7 +934,7 @@ void shop()
 
     do
     {
-        printf("POTIONS \n \n");
+              printf("POTIONS \n \n");
 
         printf("1) HEALTH POTION - 30 gold \n");
         printf("gives you 25 hp \n\n");
@@ -945,53 +945,53 @@ void shop()
         printf("ARMORS \n \n");
 
         printf("3) LEATHER ARMOR - 150 \n");
-        printf("gives you 50 armor \n\n");
+        printf("gives you 25 armor \n\n");
 
         printf("4) IRON ARMOR - 300 \n");
-        printf("gives you 150 armor \n\n");
+        printf("gives you 75 armor \n\n");
 
         printf("5) STEEL ARMOR - 900 \n");
-        printf("gives you 300 armor \n\n");
+        printf("gives you 150 armor \n\n");
 
         printf("6) DRAGON ARMOR - 1200 \n");
-        printf("gives you 400 armor \n\n");
+        printf("gives you 200 armor \n\n");
 
         printf("7) PLATINUM ARMOR - 1700 \n");
-        printf("gives you 550 armor \n\n");
+        printf("gives you 275 armor \n\n");
 
         printf("SHIELDS \n \n");
 
         printf("8) LEATHER SHIELD - 150 \n");
-        printf("gives you 50 armor \n\n");
+        printf("gives you 25 armor \n\n");
 
         printf("9) IRON SHIELD - 300 \n");
-        printf("gives you 150 armor \n\n");
+        printf("gives you 75 armor \n\n");
 
         printf("10) STEEL SHIELD - 900 \n");
-        printf("gives you 300 armor \n\n");
+        printf("gives you 150 armor \n\n");
 
         printf("11) DRAGON SHIELD - 1200 \n");
-        printf("gives you 400 armor \n\n");
+        printf("gives you 200 armor \n\n");
 
         printf("12) PLATINUM SHIELD - 1700 \n");
-        printf("gives you 550 armor \n\n");
+        printf("gives you 275 armor \n\n");
 
         printf("WEAPONS \n \n");
 
         printf("13) WOODEN SWORD - 150 \n");
-        printf("gives you 25 damage \n\n");
+        printf("gives you 15 damage \n\n");
 
         printf("14) IRON SWORD - 300 \n");
-        printf("gives you 75 damage \n\n");
+        printf("gives you 25 damage \n\n");
 
         printf("15) STEEL SWORD - 900 \n");
-        printf("gives you 150 damage \n\n");
+        printf("gives you 50 damage \n\n");
 
         printf("16) DRAGON SWORD - 1200 \n");
-        printf("gives you 200 damage \n\n");
+        printf("gives you 70 damage \n\n");
 
         printf("17) PLATINUM SWORD - 1700 \n");
-        printf("gives you 275 damage \n\n");
+        printf("gives you 100 damage \n\n");
 
         printf("Press q to leave \n\n");
 
