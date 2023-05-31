@@ -409,7 +409,7 @@ void Combat()
             {
                 // Print the available skills from player.txt
 
-               printf("Skills:\n");
+                printf("Skills:\n");
                 for (int i = 0; i < numSkills; i++)
                 {
                     printf("%d. Skill Name: %s\n", i + 1, skills[i].skillname);
@@ -420,7 +420,7 @@ void Combat()
                 }
 
                 // Player chooses a skill
-                
+
                 printf("Choose a skill (1-%d): ", numSkills);
                 int choice = getch() - '0';
                 if (choice >= 1 && choice <= numSkills)
@@ -434,7 +434,7 @@ void Combat()
                         printf("You don't have enough mana!\n");
                         break;
                     }
-                    printf("\033[%dA",(numSkills * 5) + 1);
+                    printf("\033[%dA", (numSkills * 5) + 1);
                     printf("\033[0J");
                     printf("%s!\n", chosenSkill.skillname);
                     if (strcmp(chosenSkill.type, "damage") == 0)
@@ -451,15 +451,21 @@ void Combat()
                     {
                         printf("You healed yourself for %d hp!\n", chosenSkill.value);
                         self.hp += chosenSkill.value;
+                        if (self.hp > self.maxhp)
+                        {
+                            self.hp = self.maxhp;
+                        }
                     }
                     else if (strcmp(chosenSkill.type, "instakill") == 0)
                     {
                         printf("You decimated the monster with %d dmg!\n", chosenSkill.value + self.totaldmg);
                         monster.hp -= self.totaldmg + chosenSkill.value;
                     }
-                     else if (strcmp(chosenSkill.type, "escape") == 0)
+                    else if (strcmp(chosenSkill.type, "escape") == 0)
                     {
                         printf("You ran away!\n");
+                        system("pause");
+                        system("cls");
                         return;
                     }
                     else if (strcmp(chosenSkill.type, "selfharm") == 0)
@@ -708,11 +714,11 @@ void CreateScore()
 void ResetSkills()
 {
     FILE *file = fopen("skills/player.txt", "w");
-    fprintf(file,"fireball,25,30,damage\n");
+    fprintf(file, "fireball,25,30,damage\n");
     fclose(file);
 
     file = fopen("skills/skills.txt", "w");
-    //copy the contents of skills_default.txt to skills.txt
+    // copy the contents of skills_default.txt to skills.txt
     FILE *file2 = fopen("skills/skills_default.txt", "r");
     char line[MAX_LENGTH];
     while (fgets(line, sizeof(line), file2) != NULL)
@@ -808,7 +814,9 @@ void SetCursorPosition(int x, int y)
 
 void Print_map()
 {
+    
     SetCursorPosition(0, 0);
+    printf("|X -> You\tT -> Forest\tO -> Water\tM -> Mountains\t- -> Plains|\n\n");
     for (i = 0; i < SIZE_Y; i++)
     {
         for (j = 0; j < SIZE_X; j++)
@@ -880,7 +888,7 @@ void MoveUpdate()
     }
     srand(time(NULL));
     Ecounter = rand() % 100 + 1;
-    if (Ecounter >= 1 && Ecounter <= 30 && Controller != 'q')
+    if (Ecounter >= 1 && Ecounter <= 40 && Controller != 'q')
     {
         boss++;
         printf("\033[0;31m");
@@ -897,7 +905,7 @@ void MoveUpdate()
         system("cls");
         Combat();
     }
-    if (Ecounter >= 31 && Ecounter <= 50 && Controller != 'q')
+    else if (Ecounter >= 41 && Ecounter <= 50 && Controller != 'q')
     {
         printf("\033[0;32m");
         printf("\nYou found a resting spot!\n");
@@ -918,6 +926,27 @@ void MoveUpdate()
         printf("\033[0m");
         Sleep(2000);
         printf("\033[3A");
+        printf("\033[0J");
+    }
+    else if (Ecounter >= 51 && Ecounter <= 53 && Controller != 'q')
+    {
+        // yellow font color
+        printf("\033[0;33m");
+        printf("\nYou found a treasure chest!\n");
+        int goldgain = rand() % 501 + 500;
+        printf("You gained %d gold!", goldgain);
+        printf("\033[0m");
+        self.gold += goldgain;
+        Sleep(2000);
+        printf("\033[2A");
+        printf("\033[0J");
+    }
+    else if (Ecounter >= 54 && Ecounter <= 65 && Controller != 'q')
+    {
+        printf("\nYou stepped in shit...\n");
+        printf("Dignity -20");
+        Sleep(2000);
+        printf("\033[2A");
         printf("\033[0J");
     }
 }
@@ -992,12 +1021,12 @@ void shop()
 
         printf("17) PLATINUM SWORD - 1700 \n");
         printf("gives you 275 damage \n\n");
+        printf("You have %d gold\n", self.gold);
+        printf("Press q to leave\n");
 
-        printf("Press q to leave \n\n");
+        scanf("%s", koupe);
 
-        scanf("%s",koupe);
-
-        if ((strcmp(koupe, "1")==0))
+        if ((strcmp(koupe, "1") == 0))
         {
             if (self.gold >= 30)
             {
@@ -1017,7 +1046,7 @@ void shop()
             }
         }
 
-        if ((strcmp(koupe, "2")==0))
+        if ((strcmp(koupe, "2") == 0))
         {
             if (self.gold >= 30)
             {
@@ -1037,7 +1066,7 @@ void shop()
             }
         }
 
-        if(strcmp(koupe, "3") == 0 || strcmp(koupe, "4") == 0 || strcmp(koupe, "5") == 0 || strcmp(koupe, "6") == 0 || strcmp(koupe, "7") == 0 || strcmp(koupe, "8") == 0 || strcmp(koupe, "9") == 0 || strcmp(koupe, "10") == 0 || strcmp(koupe, "11") == 0 || strcmp(koupe, "12") == 0 || strcmp(koupe, "13") == 0 || strcmp(koupe, "14") == 0 || strcmp(koupe, "15") == 0 || strcmp(koupe, "16") == 0 || strcmp(koupe, "17") == 0)
+        if (strcmp(koupe, "3") == 0 || strcmp(koupe, "4") == 0 || strcmp(koupe, "5") == 0 || strcmp(koupe, "6") == 0 || strcmp(koupe, "7") == 0 || strcmp(koupe, "8") == 0 || strcmp(koupe, "9") == 0 || strcmp(koupe, "10") == 0 || strcmp(koupe, "11") == 0 || strcmp(koupe, "12") == 0 || strcmp(koupe, "13") == 0 || strcmp(koupe, "14") == 0 || strcmp(koupe, "15") == 0 || strcmp(koupe, "16") == 0 || strcmp(koupe, "17") == 0)
         {
             UpdateEquipment(koupe);
         }
@@ -1169,8 +1198,8 @@ void UsePotion()
         printf("ITEMS:\n \n");
         PrintItems();
         printf("\n");
-        printf("mate %d / %d HP \n",self.hp,self.maxhp);
-        printf("mate %d / %d HP \n\n",self.mana,self.maxmana);     
+        printf("%d / %d HP \n", self.hp, self.maxhp);
+        printf("%d / %d MANA \n\n", self.mana, self.maxmana);
         printf("press q to leave \n");
         input = getch();
 
@@ -1283,10 +1312,11 @@ void DecreaseItemCount(char input)
     }
 }
 
-void UpdateEquipment(char input[4]) {
+void UpdateEquipment(char input[4])
+{
     int lineCount = 0;
     char line[256];
-    char* token;
+    char *token;
     char name[20];
     char tool[20];
     int price;
@@ -1294,17 +1324,20 @@ void UpdateEquipment(char input[4]) {
     char function[20];
     char temp[256];
 
-    FILE* file = fopen("shop_items.txt", "r");
-    if (file == NULL) {
+    FILE *file = fopen("shop_items.txt", "r");
+    if (file == NULL)
+    {
         printf("Failed to open the file.\n");
         return;
     }
 
     int targetLine = atoi(input);
 
-    while (fgets(line, sizeof(line), file) != NULL) {
+    while (fgets(line, sizeof(line), file) != NULL)
+    {
         lineCount++;
-        if (lineCount == targetLine) {
+        if (lineCount == targetLine)
+        {
             char tempLine[256];
             strcpy(tempLine, line);
 
@@ -1320,24 +1353,24 @@ void UpdateEquipment(char input[4]) {
             token = strtok(NULL, " \t");
             strcpy(function, token);
 
-            if(price>self.gold)
+            if (price > self.gold)
             {
                 printf("you are too poor :( \n");
                 Sleep(1500);
                 return;
             }
-
-            if(strcmp(tool,"armor")==0)
+            self.gold -= price;
+            if (strcmp(tool, "armor") == 0)
             {
-                self.armor=value;
+                self.armor = value;
             }
-            else if(strcmp(tool,"sword")==0)
+            else if (strcmp(tool, "sword") == 0)
             {
-                self.weapondmg=value;
+                self.weapondmg = value;
             }
-            else if(strcmp(tool,"shield")==0)
+            else if (strcmp(tool, "shield") == 0)
             {
-                self.defense=value;
+                self.defense = value;
             }
 
             printf("item bought \n");
@@ -1349,14 +1382,16 @@ void UpdateEquipment(char input[4]) {
     fclose(file);
 
     file = fopen("items.txt", "r");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Failed to open the file.\n");
         sleep(3);
         return;
     }
 
-    FILE* tempFile = fopen("temporary.txt", "w");
-    if (tempFile == NULL) {
+    FILE *tempFile = fopen("temporary.txt", "w");
+    if (tempFile == NULL)
+    {
         printf("Failed to create the temporary file.\n");
         sleep(3);
         fclose(file);
@@ -1367,15 +1402,18 @@ void UpdateEquipment(char input[4]) {
     int matchLineNum = -1;
     char word1[100], word2[100];
 
-    while (fgets(line, sizeof(line), file)) {
-        if (sscanf(line, "%s %s", word1, word2) == 2) {
+    while (fgets(line, sizeof(line), file))
+    {
+        if (sscanf(line, "%s %s", word1, word2) == 2)
+        {
             if (strcmp(word2, tool) == 0)
             {
 
                 matchLineNum = lineNum;
             }
         }
-        if (matchLineNum != lineNum) {
+        if (matchLineNum != lineNum)
+        {
             fputs(line, tempFile);
         }
         else if (matchLineNum == lineNum)
@@ -1385,29 +1423,30 @@ void UpdateEquipment(char input[4]) {
             strcat(concatenated, " ");
             strcat(concatenated, tool);
             fputs(concatenated, tempFile);
-            fputs("\n",tempFile);
+            fputs("\n", tempFile);
         }
         lineNum++;
     }
 
-
-
     fclose(file);
     fclose(tempFile);
 
-    if (remove("items.txt") == 0) {
+    if (remove("items.txt") == 0)
+    {
         printf("Original file deleted successfully.\n");
-    } else {
+    }
+    else
+    {
         printf("Failed to delete the original file.\n");
         return;
     }
 
-    if (rename("temporary.txt", "items.txt") == 0) {
-
-    } else {
+    if (rename("temporary.txt", "items.txt") == 0)
+    {
+    }
+    else
+    {
 
         return;
     }
 }
-
-
