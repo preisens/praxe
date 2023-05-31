@@ -1,6 +1,6 @@
-steel armor
+leather armor
 iron shield
 iron sword
 
-1) health potion 12
-2) mana potion 8
+1) health potion 1
+2) mana potion 7

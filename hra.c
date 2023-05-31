@@ -50,7 +50,7 @@ void Welcome()
     fclose(f);
     Sleep(2000);
     printf("\n\nWelcome to the game!\n");
-    printf("What is your nickname?\n");
+    printf("What is your nickname?\n\n");
 
     scanf("%s", nickname);
 
@@ -865,53 +865,53 @@ void shop()
 
         printf("ARMORS \n \n");
 
-        printf("3) LEATHER ARMOR - 50 \n");
+        printf("3) LEATHER ARMOR - 150 \n");
         printf("gives you 50 armor \n\n");
 
-        printf("4) IRON ARMOR - 100 \n");
+        printf("4) IRON ARMOR - 300 \n");
         printf("gives you 150 armor \n\n");
 
-        printf("5) STEEL ARMOR - 300 \n");
+        printf("5) STEEL ARMOR - 900 \n");
         printf("gives you 300 armor \n\n");
 
-        printf("6) DRAGON ARMOR - 400 \n");
+        printf("6) DRAGON ARMOR - 1200 \n");
         printf("gives you 400 armor \n\n");
 
-        printf("7) PLATINUM ARMOR - 569 \n");
+        printf("7) PLATINUM ARMOR - 1700 \n");
         printf("gives you 550 armor \n\n");
 
         printf("SHIELDS \n \n");
 
-        printf("8) LEATHER SHIELD - 50 \n");
+        printf("8) LEATHER SHIELD - 150 \n");
         printf("gives you 50 armor \n\n");
 
-        printf("9) IRON SHIELD - 100 \n");
+        printf("9) IRON SHIELD - 300 \n");
         printf("gives you 150 armor \n\n");
 
-        printf("10) STEEL SHIELD - 300 \n");
+        printf("10) STEEL SHIELD - 900 \n");
         printf("gives you 300 armor \n\n");
 
-        printf("11) DRAGON SHIELD - 400 \n");
+        printf("11) DRAGON SHIELD - 1200 \n");
         printf("gives you 400 armor \n\n");
 
-        printf("12) PLATINUM SHIELD - 569 \n");
+        printf("12) PLATINUM SHIELD - 1700 \n");
         printf("gives you 550 armor \n\n");
 
         printf("WEAPONS \n \n");
 
-        printf("13) WOODEN SWORD - 50 \n");
+        printf("13) WOODEN SWORD - 150 \n");
         printf("gives you 25 damage \n\n");
 
-        printf("14) IRON SWORD - 100 \n");
+        printf("14) IRON SWORD - 300 \n");
         printf("gives you 75 damage \n\n");
 
-        printf("15) STEEL SWORD - 300 \n");
+        printf("15) STEEL SWORD - 900 \n");
         printf("gives you 150 damage \n\n");
 
-        printf("16) DRAGON SWORD - 400 \n");
+        printf("16) DRAGON SWORD - 1200 \n");
         printf("gives you 200 damage \n\n");
 
-        printf("17) PLATINUM SWORD - 569 \n");
+        printf("17) PLATINUM SWORD - 1700 \n");
         printf("gives you 275 damage \n\n");
 
         printf("Press q to leave \n\n");
@@ -1023,7 +1023,7 @@ void UpdateItemNumber(const char *itemName)
 
             // Generate the modified line with the updated quantity
             char modifiedLine[100];
-            snprintf(modifiedLine, sizeof(modifiedLine), "%d)%s %d\n", id, itemName, quantity);
+            snprintf(modifiedLine, sizeof(modifiedLine), "%d) %s %d\n", id, itemName, quantity);
 
             // Append the modified line to the content string
             strcat(modifiedContent, modifiedLine);
@@ -1090,6 +1090,8 @@ void UsePotion()
         printf("ITEMS:\n \n");
         PrintItems();
         printf("\n");
+        printf("mate %d / %d HP \n",self.hp,self.maxhp);
+        printf("mate %d / %d HP \n\n",self.mana,self.maxmana);     
         printf("press q to leave \n");
         input = getch();
 
@@ -1101,7 +1103,7 @@ void UsePotion()
 
         }
 
-        printf("\033[10A");
+        printf("\033[13A");
         printf("\033[0J");
 
     } while (input != 'q');
