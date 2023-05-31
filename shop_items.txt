@@ -1,0 +1,17 @@
+
+
+leather armor 150 50 ar
+iron armor 300 150 ar
+steel armor 900 300 ar
+dragon armor 1200 400 ar
+platinum armor 1700 550 ar
+leather shield 150 50 ar
+iron shield 300 150 ar
+steel shield 900 300 ar
+dragon shield 1200 400 ar
+platinum shield 1700 550 ar
+wooden sword 150 25 at
+iron sword 300 75 at
+steel sword 900 150 at
+dragon sword 1200 200 at
+platinum sword 1700 275 at

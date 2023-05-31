@@ -60,7 +60,7 @@ void Welcome()
     fclose(f);
     Sleep(2000);
     printf("\n\nWelcome to the game!\n");
-    printf("What is your nickname?\n");
+    printf("What is your nickname?\n\n");
 
     scanf("%s", nickname);
 
@@ -924,7 +924,7 @@ void MoveUpdate()
 
 void shop()
 {
-    char koupe;
+    char koupe[4];
 
     printf("Welcome to shop \n");
     Sleep(500);
@@ -934,6 +934,7 @@ void shop()
 
     do
     {
+        printf("POTIONS \n \n");
 
         printf("1) HEALTH POTION - 30 gold \n");
         printf("gives you 25 hp \n\n");
@@ -941,11 +942,62 @@ void shop()
         printf("2) MANA POTION - 30 gold \n");
         printf("gives you 30 mana power \n\n");
 
-        printf("Press q to leave \n");
+        printf("ARMORS \n \n");
 
-        koupe = getch();
+        printf("3) LEATHER ARMOR - 150 \n");
+        printf("gives you 50 armor \n\n");
 
-        if (koupe == '1')
+        printf("4) IRON ARMOR - 300 \n");
+        printf("gives you 150 armor \n\n");
+
+        printf("5) STEEL ARMOR - 900 \n");
+        printf("gives you 300 armor \n\n");
+
+        printf("6) DRAGON ARMOR - 1200 \n");
+        printf("gives you 400 armor \n\n");
+
+        printf("7) PLATINUM ARMOR - 1700 \n");
+        printf("gives you 550 armor \n\n");
+
+        printf("SHIELDS \n \n");
+
+        printf("8) LEATHER SHIELD - 150 \n");
+        printf("gives you 50 armor \n\n");
+
+        printf("9) IRON SHIELD - 300 \n");
+        printf("gives you 150 armor \n\n");
+
+        printf("10) STEEL SHIELD - 900 \n");
+        printf("gives you 300 armor \n\n");
+
+        printf("11) DRAGON SHIELD - 1200 \n");
+        printf("gives you 400 armor \n\n");
+
+        printf("12) PLATINUM SHIELD - 1700 \n");
+        printf("gives you 550 armor \n\n");
+
+        printf("WEAPONS \n \n");
+
+        printf("13) WOODEN SWORD - 150 \n");
+        printf("gives you 25 damage \n\n");
+
+        printf("14) IRON SWORD - 300 \n");
+        printf("gives you 75 damage \n\n");
+
+        printf("15) STEEL SWORD - 900 \n");
+        printf("gives you 150 damage \n\n");
+
+        printf("16) DRAGON SWORD - 1200 \n");
+        printf("gives you 200 damage \n\n");
+
+        printf("17) PLATINUM SWORD - 1700 \n");
+        printf("gives you 275 damage \n\n");
+
+        printf("Press q to leave \n\n");
+
+        scanf("%s",koupe);
+
+        if ((strcmp(koupe, "1")==0))
         {
             if (self.gold >= 30)
             {
@@ -965,7 +1017,7 @@ void shop()
             }
         }
 
-        if (koupe == '2')
+        if ((strcmp(koupe, "2")==0))
         {
             if (self.gold >= 30)
             {
@@ -985,9 +1037,14 @@ void shop()
             }
         }
 
+        if(strcmp(koupe, "3") == 0 || strcmp(koupe, "4") == 0 || strcmp(koupe, "5") == 0 || strcmp(koupe, "6") == 0 || strcmp(koupe, "7") == 0 || strcmp(koupe, "8") == 0 || strcmp(koupe, "9") == 0 || strcmp(koupe, "10") == 0 || strcmp(koupe, "11") == 0 || strcmp(koupe, "12") == 0 || strcmp(koupe, "13") == 0 || strcmp(koupe, "14") == 0 || strcmp(koupe, "15") == 0 || strcmp(koupe, "16") == 0 || strcmp(koupe, "17") == 0)
+        {
+            UpdateEquipment(koupe);
+        }
+
         system("cls");
 
-    } while (koupe != 'q');
+    } while (strcmp(koupe, "q") != 0);
 }
 
 void PrintItems()
@@ -1112,6 +1169,8 @@ void UsePotion()
         printf("ITEMS:\n \n");
         PrintItems();
         printf("\n");
+        printf("mate %d / %d HP \n",self.hp,self.maxhp);
+        printf("mate %d / %d HP \n\n",self.mana,self.maxmana);     
         printf("press q to leave \n");
         input = getch();
 
@@ -1122,7 +1181,7 @@ void UsePotion()
             printf("\033[0J");
         }
 
-        printf("\033[10A");
+        printf("\033[13A");
         printf("\033[0J");
 
     } while (input != 'q');
@@ -1223,3 +1282,132 @@ void DecreaseItemCount(char input)
         printf("Failed to rename the temporary file\n");
     }
 }
+
+void UpdateEquipment(char input[4]) {
+    int lineCount = 0;
+    char line[256];
+    char* token;
+    char name[20];
+    char tool[20];
+    int price;
+    int value;
+    char function[20];
+    char temp[256];
+
+    FILE* file = fopen("shop_items.txt", "r");
+    if (file == NULL) {
+        printf("Failed to open the file.\n");
+        return;
+    }
+
+    int targetLine = atoi(input);
+
+    while (fgets(line, sizeof(line), file) != NULL) {
+        lineCount++;
+        if (lineCount == targetLine) {
+            char tempLine[256];
+            strcpy(tempLine, line);
+
+            token = strtok(tempLine, " \t");
+
+            strcpy(name, token);
+            token = strtok(NULL, " \t");
+            strcpy(tool, token);
+            token = strtok(NULL, " \t");
+            price = atoi(token);
+            token = strtok(NULL, " \t");
+            value = atoi(token);
+            token = strtok(NULL, " \t");
+            strcpy(function, token);
+
+            if(price>self.gold)
+            {
+                printf("you are too poor :( \n");
+                Sleep(1500);
+                return;
+            }
+
+            if(strcmp(tool,"armor")==0)
+            {
+                self.armor=value;
+            }
+            else if(strcmp(tool,"sword")==0)
+            {
+                self.weapondmg=value;
+            }
+            else if(strcmp(tool,"shield")==0)
+            {
+                self.defense=value;
+            }
+
+            printf("item bought \n");
+
+            break;
+        }
+    }
+
+    fclose(file);
+
+    file = fopen("items.txt", "r");
+    if (file == NULL) {
+        printf("Failed to open the file.\n");
+        sleep(3);
+        return;
+    }
+
+    FILE* tempFile = fopen("temporary.txt", "w");
+    if (tempFile == NULL) {
+        printf("Failed to create the temporary file.\n");
+        sleep(3);
+        fclose(file);
+        return;
+    }
+
+    int lineNum = 1;
+    int matchLineNum = -1;
+    char word1[100], word2[100];
+
+    while (fgets(line, sizeof(line), file)) {
+        if (sscanf(line, "%s %s", word1, word2) == 2) {
+            if (strcmp(word2, tool) == 0)
+            {
+
+                matchLineNum = lineNum;
+            }
+        }
+        if (matchLineNum != lineNum) {
+            fputs(line, tempFile);
+        }
+        else if (matchLineNum == lineNum)
+        {
+            char concatenated[100];
+            strcpy(concatenated, name);
+            strcat(concatenated, " ");
+            strcat(concatenated, tool);
+            fputs(concatenated, tempFile);
+            fputs("\n",tempFile);
+        }
+        lineNum++;
+    }
+
+
+
+    fclose(file);
+    fclose(tempFile);
+
+    if (remove("items.txt") == 0) {
+        printf("Original file deleted successfully.\n");
+    } else {
+        printf("Failed to delete the original file.\n");
+        return;
+    }
+
+    if (rename("temporary.txt", "items.txt") == 0) {
+
+    } else {
+
+        return;
+    }
+}
+
+
