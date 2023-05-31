@@ -10,3 +10,6 @@ no: 0.0
 vojta: 1362.0
 Vojta: 0.0
 >>>>>>> Updating-shop
+vojta: 267.3
+VOjt: 627.0
+VOjtano: 2586.0
