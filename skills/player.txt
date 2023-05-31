@@ -1,0 +1,1 @@
+fireball,25,30,damage
