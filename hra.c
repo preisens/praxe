@@ -22,6 +22,8 @@ int x = 10;
 int y = 10;
 int option = 1;
 char keyPressed;
+float Pscale=1.0;
+float Escale=1.0;
 
 typedef struct
 {
@@ -71,11 +73,11 @@ void Welcome()
 void StartPlayer()
 {
     srand(time(NULL));
-    self.maxhp = 100;
-    self.hp = 100;
+    self.maxhp = 210;
+    self.hp = 210;
     self.maxmana = 100;
     self.mana = 100;
-    self.dmg = rand() % 21 + 20;
+    self.dmg = rand() % 13 + 10;
     self.lvl = 0;
     self.exp = 0;
     self.maxexp = 100;
@@ -263,13 +265,13 @@ void Combat()
     // open a random .txt file from the folder enemies
     if (boss % 5 == 0 && boss != 0)
     {
-        monster.maxhp = rand() % 81 + 100;
-        monster.dmg = rand() % 31 + 50;
+        monster.maxhp = rand() % (int)(122*Escale) + (int)(150*Escale);
+        monster.dmg = rand() % (int)(15*Escale) + (10*Escale);
     }
     else
     {
-        monster.maxhp = rand() % 81 + 10;
-        monster.dmg = rand() % 31 + 20;
+        monster.maxhp = rand() % 150 + 50;
+        monster.dmg = rand() % 10 + 5;
     }
 
     monster.hp = monster.maxhp;
@@ -679,19 +681,24 @@ void printRandomSkills()
 
 void levelUp()
 {
+
     if (self.exp >= self.maxexp)
     {
+
+        Pscale=Pscale+0.1;
+        Escale=Escale+0.2;
+
         self.lvl++;
         self.exp = 0;
         self.maxexp += 100;
-        self.maxhp += 10;
+        self.maxhp =(int)(self.maxhp*Pscale);
         self.maxmana += 10;
-        self.dmg += 5;
+        self.dmg =(int)(self.dmg*Pscale);
         printf("You leveled up!\n");
         printf("You are now level %d!\n", self.lvl);
-        printf("You gained 10 max HP!\n");
+        printf("You gained bigger max HP!\n");
         printf("You gained 10 max mana!\n");
-        printf("You gained 5 damage!\n");
+        printf("You gained bigger damage!\n");
 
         if (self.lvl % 3 == 0)
         {
@@ -963,7 +970,7 @@ void shop()
 
     do
     {
-        printf("POTIONS \n \n");
+              printf("POTIONS \n \n");
 
         printf("1) HEALTH POTION - 30 gold \n");
         printf("gives you 25 hp \n\n");
@@ -974,55 +981,53 @@ void shop()
         printf("ARMORS \n \n");
 
         printf("3) LEATHER ARMOR - 150 \n");
-        printf("gives you 50 armor \n\n");
+        printf("gives you 25 armor \n\n");
 
         printf("4) IRON ARMOR - 300 \n");
-        printf("gives you 150 armor \n\n");
+        printf("gives you 75 armor \n\n");
 
         printf("5) STEEL ARMOR - 900 \n");
-        printf("gives you 300 armor \n\n");
+        printf("gives you 150 armor \n\n");
 
         printf("6) DRAGON ARMOR - 1200 \n");
-        printf("gives you 400 armor \n\n");
+        printf("gives you 200 armor \n\n");
 
         printf("7) PLATINUM ARMOR - 1700 \n");
-        printf("gives you 550 armor \n\n");
+        printf("gives you 275 armor \n\n");
 
         printf("SHIELDS \n \n");
 
         printf("8) LEATHER SHIELD - 150 \n");
-        printf("gives you 50 armor \n\n");
+        printf("gives you 25 armor \n\n");
 
         printf("9) IRON SHIELD - 300 \n");
-        printf("gives you 150 armor \n\n");
+        printf("gives you 75 armor \n\n");
 
         printf("10) STEEL SHIELD - 900 \n");
-        printf("gives you 300 armor \n\n");
+        printf("gives you 150 armor \n\n");
 
         printf("11) DRAGON SHIELD - 1200 \n");
-        printf("gives you 400 armor \n\n");
+        printf("gives you 200 armor \n\n");
 
         printf("12) PLATINUM SHIELD - 1700 \n");
-        printf("gives you 550 armor \n\n");
+        printf("gives you 275 armor \n\n");
 
         printf("WEAPONS \n \n");
 
         printf("13) WOODEN SWORD - 150 \n");
-        printf("gives you 25 damage \n\n");
+        printf("gives you 15 damage \n\n");
 
         printf("14) IRON SWORD - 300 \n");
-        printf("gives you 75 damage \n\n");
+        printf("gives you 25 damage \n\n");
 
         printf("15) STEEL SWORD - 900 \n");
-        printf("gives you 150 damage \n\n");
+        printf("gives you 50 damage \n\n");
 
         printf("16) DRAGON SWORD - 1200 \n");
-        printf("gives you 200 damage \n\n");
+        printf("gives you 70 damage \n\n");
 
         printf("17) PLATINUM SWORD - 1700 \n");
-        printf("gives you 275 damage \n\n");
-        printf("You have %d gold\n", self.gold);
-        printf("Press q to leave\n");
+        printf("gives you 100 damage \n\n");
 
         scanf("%s", koupe);
 
@@ -1200,6 +1205,8 @@ void UsePotion()
         printf("\n");
         printf("%d / %d HP \n", self.hp, self.maxhp);
         printf("%d / %d MANA \n\n", self.mana, self.maxmana);
+        printf("you have %d / %d HP \n",self.hp,self.maxhp);
+        printf("you have %d / %d MANA \n\n",self.mana,self.maxmana);     
         printf("press q to leave \n");
         input = getch();
 
