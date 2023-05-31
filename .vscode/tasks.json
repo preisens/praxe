@@ -10,7 +10,7 @@
                 "${workspaceFolder}\\*.c",
                 "${workspaceFolder}\\*.h",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+                "${fileDirname}\\Aetheria.exe"
             ],
             "options": {
                 "cwd": "${fileDirname}"
