@@ -1028,7 +1028,8 @@ void shop()
 
         printf("17) PLATINUM SWORD - 1700 \n");
         printf("gives you 100 damage \n\n");
-
+        printf("You have %d gold \n", self.gold);
+        printf("Choose what you want to buy or press q to quit \n");
         scanf("%s", koupe);
 
         if ((strcmp(koupe, "1") == 0))
