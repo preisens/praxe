@@ -43,7 +43,7 @@ void SetCursorPosition(int x, int y);
 
 void PrintItems();
 
-void UsePotion();
+void UsePotion(int *invalid);
 
 void ResetItems();
 
@@ -51,9 +51,9 @@ void UpdateItemNumber(const char* itemName);
 
 void shop();
 
-void DecreaseItemCount(char input);
+int DecreaseItemCount(char input, int *mpotion, int *hpotion);
 
-void UpdateEquipment(char input[4]);
+void UpdateEquipment(int input);
 void readSkills();
 
 void printRandomSkills();

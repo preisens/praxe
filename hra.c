@@ -22,8 +22,8 @@ int x = 10;
 int y = 10;
 int option = 1;
 char keyPressed;
-float Pscale=1.0;
-float Escale=1.0;
+float Pscale = 1.0;
+float Escale = 1.0;
 
 typedef struct
 {
@@ -53,6 +53,8 @@ struct stats
 
 void Welcome()
 {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, 12);
     FILE *f = fopen("title.txt", "r");
     char c;
     while ((c = fgetc(f)) != EOF)
@@ -60,6 +62,7 @@ void Welcome()
         printf("%c", c);
     }
     fclose(f);
+    SetConsoleTextAttribute(hConsole, 15);
     Sleep(2000);
     printf("\n\nWelcome to the game!\n");
     printf("What is your nickname?\n\n");
@@ -82,7 +85,7 @@ void StartPlayer()
     self.exp = 0;
     self.maxexp = 100;
     self.totalexp = 0;
-    self.gold = 0;
+    self.gold = 1000;
     self.totalgold = 0;
     self.armor = 0;
     self.weapondmg = 0;
@@ -192,7 +195,8 @@ void Menu()
                 printf("Your gold: %d\n", self.gold);
                 system("pause");
                 system("cls");
-                UsePotion();
+                int invalid = 0;
+                UsePotion(&invalid);
                 system("cls");
             }
             break;
@@ -261,12 +265,14 @@ int compare_scores(const void *a, const void *b)
 }
 void Combat()
 {
+    int deleteskills = 0;
+    int block = 0;
     srand(time(NULL));
     // open a random .txt file from the folder enemies
     if (boss % 5 == 0 && boss != 0)
     {
-        monster.maxhp = rand() % (int)(122*Escale) + (int)(150*Escale);
-        monster.dmg = rand() % (int)(15*Escale) + (10*Escale);
+        monster.maxhp = rand() % (int)(122 * Escale) + (int)(150 * Escale);
+        monster.dmg = rand() % (int)(15 * Escale) + (10 * Escale);
     }
     else
     {
@@ -335,6 +341,7 @@ void Combat()
     int totalOptions = 5;
     while (monster.hp > 0 && self.hp > 0)
     {
+        int invalid = 0;
         while (1)
         {
             printf("-----------------------------------------------------------------\n");
@@ -483,11 +490,14 @@ void Combat()
                 else
                 {
                     printf("Invalid choice.\n");
+                    system("pause");
+                    invalid = 2;
+                    deleteskills = (numSkills * 5) + 2;
                 }
             }
             else
             {
-                printf("You don't have any special skills\n");
+                printf("You don't have any skills\n");
             }
 
             if (self.mana < 0)
@@ -499,8 +509,8 @@ void Combat()
         case 3:
         {
             printf("You chose to defend!\n");
-            self.defense = rand() % 31 + 20;
-            printf("You are blocking %d of dmg!\n", self.defense);
+            int block = self.defense + rand() % 6 + 5;
+            printf("You are blocking %d of dmg!\n", block);
             system("pause");
             printf("\033[3A");
             printf("\033[0J");
@@ -508,7 +518,7 @@ void Combat()
         break;
         case 4:
         {
-            UsePotion();
+            UsePotion(&invalid);
         }
         break;
         case 5:
@@ -531,26 +541,59 @@ void Combat()
         }
         break;
         }
-        if (monster.hp > 0 && self.hp > 0)
+        if (monster.hp > 0 && self.hp > 0 && invalid == 0)
         {
-            monster.totaldmg = (monster.dmg + rand() % 16 + 0) - self.defense;
-            printf("The monster attacked you!\n");
-            if (monster.totaldmg >= 0)
+            srand(time(NULL));
+            int chance = rand() % 3 + 1;
+            if (chance == 1)
             {
-                printf("The monster dealt %d damage to you!\n", monster.totaldmg);
-                self.hp -= monster.totaldmg;
+                monster.totaldmg = (monster.dmg + rand() % 16 + 0) - block - self.armor;
+                printf("The monster attacked you!\n");
+                if (monster.totaldmg >= 0)
+                {
+                    printf("The monster dealt %d damage to you!\n", monster.totaldmg);
+                    self.hp -= monster.totaldmg;
+                }
+                else
+                {
+                    printf("The monster dealt 0 damage to you!\n");
+                }
             }
-            else
+            else if (chance == 2)
             {
-                printf("The monster dealt 0 damage to you!\n");
+                printf("The monster licked it's wounds!\n");
+                int hpgain = rand() % (monster.maxhp / 2);
+                monster.hp += hpgain;
+                if (monster.hp > monster.maxhp)
+                {
+                    monster.hp = monster.maxhp;
+                }
+                printf("The monster healed %d hp!\n", hpgain);
             }
-            self.defense = 0;
+            else if (chance == 3)
+            {
+                printf("The monster is checking you out...\n");
+                printf("It doesn't seem to be attacking!\n");
+            }
             system("pause");
             printf("\033[2A");
             printf("\033[0J");
         }
-        printf("\033[10A");
-        printf("\033[0J");
+        if (invalid == 0)
+        {
+            printf("\033[10A");
+            printf("\033[0J");
+        }
+        else if (invalid == 1)
+        {
+            printf("\033[9A");
+            printf("\033[0J");
+        }
+        else if (invalid == 2)
+        {
+            printf("\033[%dA", deleteskills + 10);
+            printf("\033[0J");
+        }
     }
     if (self.hp > 0)
     {
@@ -685,15 +728,15 @@ void levelUp()
     if (self.exp >= self.maxexp)
     {
 
-        Pscale=Pscale+0.1;
-        Escale=Escale+0.2;
+        Pscale = Pscale + 0.1;
+        Escale = Escale + 0.2;
 
         self.lvl++;
         self.exp = 0;
         self.maxexp += 100;
-        self.maxhp =(int)(self.maxhp*Pscale);
+        self.maxhp = (int)(self.maxhp * Pscale);
         self.maxmana += 10;
-        self.dmg =(int)(self.dmg*Pscale);
+        self.dmg = (int)(self.dmg * Pscale);
         printf("You leveled up!\n");
         printf("You are now level %d!\n", self.lvl);
         printf("You gained bigger max HP!\n");
@@ -821,9 +864,9 @@ void SetCursorPosition(int x, int y)
 
 void Print_map()
 {
-    
+
     SetCursorPosition(0, 0);
-    printf("|X -> You\tT -> Forest\tO -> Water\tM -> Mountains\t- -> Plains|\n\n");
+    printf("\033[0;31mX -> You\t\033[0;32mT -> Forest\t\033[0;34mO -> Water\t\033[0;37mM -> Mountains\t\033[0;33m- -> Plains\033[0m\n\n");
     for (i = 0; i < SIZE_Y; i++)
     {
         for (j = 0; j < SIZE_X; j++)
@@ -957,82 +1000,119 @@ void MoveUpdate()
         printf("\033[0J");
     }
 }
-
 void shop()
 {
-    char koupe[4];
+    int koupe = 1;
 
     printf("Welcome to shop \n");
     Sleep(500);
     printf("This is what we offer\n\n");
     Sleep(1500);
     system("cls");
-
+    int totalOptions = 17;
     do
     {
-              printf("POTIONS \n \n");
+        int cursorPosition = 1;
+        while (1)
+        {
+            system("cls");
+            printf("POTIONS \n \n");
 
-        printf("1) HEALTH POTION - 30 gold \n");
-        printf("gives you 25 hp \n\n");
+            printf("1)\033[0;32m HEALTH POTION\033[0m - \033[0;33m30 gold\033[0m%s \n", (koupe == 1 ? " <--" : ""));
+            printf("\033[0;90mgives you 25 hp\033[0m \n\n");
 
-        printf("2) MANA POTION - 30 gold \n");
-        printf("gives you 30 mana power \n\n");
+            printf("2) \033[0;36mMANA POTION\033[0m - \033[0;33m30 gold\033[0m%s \n", (koupe == 2 ? " <--" : ""));
+            printf("\033[0;90mgives you 30 mana power\033[0m \n\n");
 
-        printf("ARMORS \n \n");
+            printf("\033[0;35mARMORS\033[0m \n \n");
 
-        printf("3) LEATHER ARMOR - 150 \n");
-        printf("gives you 25 armor \n\n");
+            printf("3)\033[0;91m LEATHER ARMOR\033[0m - \033[0;33m150 gold\033[0m%s \n", (koupe == 3 ? " <--" : ""));
+            printf("\033[0;90mgives you 25 armor\033[0m \n\n");
 
-        printf("4) IRON ARMOR - 300 \n");
-        printf("gives you 75 armor \n\n");
+            printf("4)\033[0;90m IRON ARMOR\033[0m - \033[0;33m300 gold\033[0m%s \n", (koupe == 4 ? " <--" : ""));
+            printf("\033[0;90mgives you 75 armor\033[0m \n\n");
 
-        printf("5) STEEL ARMOR - 900 \n");
-        printf("gives you 150 armor \n\n");
+            printf("5)\033[0;97m STEEL ARMOR\033[0m - \033[0;33m900 gold\033[0m%s \n", (koupe == 5 ? " <--" : ""));
+            printf("\033[0;90mgives you 150 armor\033[0m \n\n");
 
-        printf("6) DRAGON ARMOR - 1200 \n");
-        printf("gives you 200 armor \n\n");
+            printf("6)\033[0;93m DRAGON ARMOR\033[0m - \033[0;33m1200 gold\033[0m%s \n", (koupe == 6 ? " <--" : ""));
+            printf("\033[0;90mgives you 200 armor\033[0m \n\n");
 
-        printf("7) PLATINUM ARMOR - 1700 \n");
-        printf("gives you 275 armor \n\n");
+            printf("7)\033[0;96m PLATINUM ARMOR\033[0m - \033[0;33m1700 gold\033[0m%s \n", (koupe == 7 ? " <--" : ""));
+            printf("\033[0;90mgives you 275 armor\033[0m \n\n");
 
-        printf("SHIELDS \n \n");
+            printf("\033[0;35mSHIELDS\033[0m \n \n");
 
-        printf("8) LEATHER SHIELD - 150 \n");
-        printf("gives you 25 armor \n\n");
+            printf("8)\033[0;91m LEATHER SHIELD\033[0m - \033[0;33m150 gold\033[0m%s \n", (koupe == 8 ? " <--" : ""));
+            printf("\033[0;90mgives you 25 defense\033[0m \n\n");
 
-        printf("9) IRON SHIELD - 300 \n");
-        printf("gives you 75 armor \n\n");
+            printf("9)\033[0;90m IRON SHIELD\033[0m - \033[0;33m300 gold\033[0m%s \n", (koupe == 9 ? " <--" : ""));
+            printf("\033[0;90mgives you 75 defense\033[0m \n\n");
 
-        printf("10) STEEL SHIELD - 900 \n");
-        printf("gives you 150 armor \n\n");
+            printf("10)\033[0;97m STEEL SHIELD\033[0m - \033[0;33m900 gold\033[0m%s \n", (koupe == 10 ? " <--" : ""));
+            printf("\033[0;90mgives you 150 defense\033[0m \n\n");
 
-        printf("11) DRAGON SHIELD - 1200 \n");
-        printf("gives you 200 armor \n\n");
+            printf("11)\033[0;93m DRAGON SHIELD\033[0m - \033[0;33m1200 gold\033[0m%s \n", (koupe == 11 ? " <--" : ""));
+            printf("\033[0;90mgives you 200 defense\033[0m \n\n");
 
-        printf("12) PLATINUM SHIELD - 1700 \n");
-        printf("gives you 275 armor \n\n");
+            printf("12)\033[0;96m PLATINUM SHIELD\033[0m - \033[0;33m1700 gold\033[0m%s \n", (koupe == 12 ? " <--" : ""));
+            printf("\033[0;90mgives you 275 defense\033[0m \n\n");
 
-        printf("WEAPONS \n \n");
+            printf("\033[0;35mWEAPONS\033[0m \n \n");
 
-        printf("13) WOODEN SWORD - 150 \n");
-        printf("gives you 15 damage \n\n");
+            printf("13)\033[0;91m WOODEN SWORD\033[0m - \033[0;33m150 gold\033[0m%s \n", (koupe == 13 ? " <--" : ""));
+            printf("\033[0;90mgives you 15 damage\033[0m \n\n");
 
-        printf("14) IRON SWORD - 300 \n");
-        printf("gives you 25 damage \n\n");
+            printf("14)\033[0;90m IRON SWORD\033[0m - \033[0;33m300 gold\033[0m%s \n", (koupe == 14 ? " <--" : ""));
+            printf("\033[0;90mgives you 25 damage\033[0m \n\n");
 
-        printf("15) STEEL SWORD - 900 \n");
-        printf("gives you 50 damage \n\n");
+            printf("15)\033[0;97m STEEL SWORD\033[0m - \033[0;33m900 gold\033[0m%s \n", (koupe == 15 ? " <--" : ""));
+            printf("\033[0;90mgives you 50 damage\033[0m \n\n");
 
-        printf("16) DRAGON SWORD - 1200 \n");
-        printf("gives you 70 damage \n\n");
+            printf("16)\033[0;93m DRAGON SWORD\033[0m - \033[0;33m1200 gold\033[0m%s \n", (koupe == 16 ? " <--" : ""));
+            printf("\033[0;90mgives you 70 damage\033[0m \n\n");
 
-        printf("17) PLATINUM SWORD - 1700 \n");
-        printf("gives you 100 damage \n\n");
-        printf("You have %d gold \n", self.gold);
-        printf("Choose what you want to buy or press q to quit \n");
-        scanf("%s", koupe);
+            printf("17)\033[0;96m PLATINUM SWORD\033[0m - \033[0;33m1700 gold\033[0m%s \n", (koupe == 17 ? " <--" : ""));
+            printf("\033[0;90mgives you 100 damage\033[0m \n\n");
+            printf("\033[0;33mYou have %d gold\033[0m \n", self.gold);
+            printf("Choose what you want to buy or press q to quit \n");
+            COORD newPosition;
+            newPosition.X = 0;
+            newPosition.Y = cursorPosition;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), newPosition);
 
-        if ((strcmp(koupe, "1") == 0))
+            keyPressed = getch();
+
+            if (keyPressed == 'w')
+            {
+                koupe--;
+                cursorPosition -= 2; // Decrease the cursor position
+                if (koupe < 1)
+                {
+                    koupe = totalOptions;
+                    cursorPosition = totalOptions * 2 - 1; // Wrap around to the last option
+                }
+            }
+            else if (keyPressed == 's')
+            {
+                koupe++;
+                cursorPosition += 2; // Increase the cursor position
+                if (koupe > totalOptions)
+                {
+                    koupe = 1;
+                    cursorPosition = 1; // Wrap around to the first option
+                }
+            }
+            else if (keyPressed == 'q')
+            {
+                koupe = 'q';
+                break;
+            }
+
+            else
+                break;
+        }
+        if (koupe == 1)
         {
             if (self.gold >= 30)
             {
@@ -1052,7 +1132,7 @@ void shop()
             }
         }
 
-        if ((strcmp(koupe, "2") == 0))
+        if (koupe == 2)
         {
             if (self.gold >= 30)
             {
@@ -1072,14 +1152,14 @@ void shop()
             }
         }
 
-        if (strcmp(koupe, "3") == 0 || strcmp(koupe, "4") == 0 || strcmp(koupe, "5") == 0 || strcmp(koupe, "6") == 0 || strcmp(koupe, "7") == 0 || strcmp(koupe, "8") == 0 || strcmp(koupe, "9") == 0 || strcmp(koupe, "10") == 0 || strcmp(koupe, "11") == 0 || strcmp(koupe, "12") == 0 || strcmp(koupe, "13") == 0 || strcmp(koupe, "14") == 0 || strcmp(koupe, "15") == 0 || strcmp(koupe, "16") == 0 || strcmp(koupe, "17") == 0)
+        if (koupe == 3 || koupe == 4 || koupe == 5 || koupe == 6 || koupe == 7 || koupe == 8 || koupe == 9 || koupe == 10 || koupe == 11 || koupe == 12 || koupe == 13 || koupe == 14 || koupe == 15 || koupe == 16 || koupe == 17)
         {
             UpdateEquipment(koupe);
         }
 
         system("cls");
 
-    } while (strcmp(koupe, "q") != 0);
+    } while (koupe != 'q');
 }
 
 void PrintItems()
@@ -1195,7 +1275,7 @@ void ResetItems()
     fclose(file);
 }
 
-void UsePotion()
+void UsePotion(int *invalid)
 {
     char input;
 
@@ -1206,25 +1286,29 @@ void UsePotion()
         printf("\n");
         printf("%d / %d HP \n", self.hp, self.maxhp);
         printf("%d / %d MANA \n\n", self.mana, self.maxmana);
-        printf("you have %d / %d HP \n",self.hp,self.maxhp);
-        printf("you have %d / %d MANA \n\n",self.mana,self.maxmana);     
         printf("press q to leave \n");
         input = getch();
 
         if (input == '1' || input == '2')
         {
-            DecreaseItemCount(input);
-            printf("\033[2A");
-            printf("\033[0J");
+            int mpotion = 0;
+            int hpotion = 0;
+            DecreaseItemCount(input, &mpotion, &hpotion);
+            if (mpotion == 1 || hpotion == 1)
+            {
+                printf("\033[2A");
+                printf("\033[0J");
+            }
         }
 
         printf("\033[13A");
         printf("\033[0J");
 
     } while (input != 'q');
+    *invalid = 1;
 }
 
-void DecreaseItemCount(char input)
+int DecreaseItemCount(char input, int *mpotion, int *hpotion)
 {
     FILE *file, *tempFile;
     int ccount = 0;
@@ -1232,14 +1316,14 @@ void DecreaseItemCount(char input)
     const char *tempFilename = "temp_items.txt";
     const int bufferSize = 100;
     char buffer[bufferSize];
-    int itemID = input - '0'; // Convert input character to integer ID
+    int itemID = atoi(&input);
 
     // Open the original file for reading
     file = fopen(filename, "r");
     if (file == NULL)
     {
         printf("Failed to open the file %s\n", filename);
-        return;
+        return 1;
     }
 
     // Create a temporary file for writing
@@ -1248,7 +1332,7 @@ void DecreaseItemCount(char input)
     {
         printf("Failed to create the temporary file %s\n", tempFilename);
         fclose(file);
-        return;
+        return 1;
     }
 
     // Copy the first 3 lines from the original file to the temporary file
@@ -1269,6 +1353,7 @@ void DecreaseItemCount(char input)
 
             if (input == '1' && ccount != 0)
             {
+                *hpotion = 1;
                 printf("\n");
                 printf("you drunk health potion and got 25 HP \n");
                 Sleep(1100);
@@ -1280,6 +1365,7 @@ void DecreaseItemCount(char input)
             }
             else if (input == '2' && ccount != 0)
             {
+                *mpotion = 1;
                 printf("\n");
                 printf("you drunk health potion and got 30 mana power \n");
                 Sleep(1100);
@@ -1312,15 +1398,16 @@ void DecreaseItemCount(char input)
     if (remove(filename) != 0)
     {
         printf("Failed to remove the original file %s\n", filename);
-        return;
+        return 1;
     }
     if (rename(tempFilename, filename) != 0)
     {
         printf("Failed to rename the temporary file\n");
     }
+    return 0;
 }
 
-void UpdateEquipment(char input[4])
+void UpdateEquipment(int input)
 {
     int lineCount = 0;
     char line[256];
@@ -1339,7 +1426,7 @@ void UpdateEquipment(char input[4])
         return;
     }
 
-    int targetLine = atoi(input);
+    int targetLine = input;
 
     while (fgets(line, sizeof(line), file) != NULL)
     {
