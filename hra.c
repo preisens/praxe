@@ -1455,6 +1455,8 @@ void UpdateEquipment(int input)
                 return;
             }
             self.gold -= price;
+            printf("you bought %s %s for %d gold \n",name, tool, price);
+            Sleep(1500);
             if (strcmp(tool, "armor") == 0)
             {
                 self.armor = value;
@@ -1526,22 +1528,10 @@ void UpdateEquipment(int input)
     fclose(file);
     fclose(tempFile);
 
-    if (remove("items.txt") == 0)
-    {
-        printf("Original file deleted successfully.\n");
-    }
-    else
-    {
-        printf("Failed to delete the original file.\n");
-        return;
-    }
+remove("items.txt");
+rename("temporary.txt", "items.txt");
 
-    if (rename("temporary.txt", "items.txt") == 0)
-    {
-    }
-    else
-    {
+return;
 
-        return;
-    }
+
 }
