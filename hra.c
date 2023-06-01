@@ -6,6 +6,7 @@
 int boss = 0;
 #define MAX_SKILLS 100
 #define MAX_LENGTH 50
+#define BUFFER_SIZE 4096
 
 typedef struct
 {
@@ -53,6 +54,7 @@ struct stats
 
 void Welcome()
 {
+    int option = 1;
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(hConsole, 12);
     FILE *f = fopen("title.txt", "r");
@@ -383,16 +385,21 @@ void Combat()
     system("pause");
     system("cls");
 
-    FILE *file = fopen(filePath, "r");
-
-    int c;
-
-    if (boss % 5 == 0 && boss != 0)
-        printf("\033[0;31m");
-
-    while ((c = fgetc(file)) != EOF)
+    FILE *file = fopen(filePath, "rb");
+    if (file == NULL)
     {
-        putchar(c);
+        printf("Failed to open the .ans file.\n");
+        return;
+    }
+
+    // Set up a buffer for reading file data
+    char buffer[BUFFER_SIZE];
+    size_t bytesRead;
+
+    // Read and print file contents in chunks
+    while ((bytesRead = fread(buffer, sizeof(char), BUFFER_SIZE, file)) > 0)
+    {
+        fwrite(buffer, sizeof(char), bytesRead, stdout);
     }
     printf("\033[0m");
     fclose(file);
@@ -608,8 +615,8 @@ void Combat()
         if (monster.hp > 0 && self.hp > 0 && invalid == 0)
         {
             srand(time(NULL));
-            int chance = rand() % (100-1+1)+1;
-            if (chance >=1 && chance<=45)
+            int chance = rand() % (100 - 1 + 1) + 1;
+            if (chance >= 1 && chance <= 45)
             {
                 monster.totaldmg = (monster.dmg + rand() % 16 + 0) - block - self.armor;
                 printf("The monster attacked you!\n");
@@ -623,7 +630,7 @@ void Combat()
                     printf("The monster dealt \033[0;31m0 damage\033[0m to you!\n");
                 }
             }
-            else if (chance >=46 && chance<=90)
+            else if (chance >= 46 && chance <= 90)
             {
                 printf("The monster licked it's wounds!\n");
                 int hpgain = rand() % (monster.maxhp / 2);
@@ -634,7 +641,7 @@ void Combat()
                 }
                 printf("The monster \033[0;32mhealed %d hp\033[0m!\n", hpgain);
             }
-            else if (chance >=91 && chance<=100)
+            else if (chance >= 91 && chance <= 100)
             {
                 printf("The monster is checking you out...\n");
                 printf("It doesn't seem to be attacking!\n");
