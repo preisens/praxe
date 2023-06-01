@@ -608,8 +608,8 @@ void Combat()
         if (monster.hp > 0 && self.hp > 0 && invalid == 0)
         {
             srand(time(NULL));
-            int chance = rand() % 3 + 1;
-            if (chance == 1)
+            int chance = rand() % (100-1+1)+1;
+            if (chance >=1 && chance<=45)
             {
                 monster.totaldmg = (monster.dmg + rand() % 16 + 0) - block - self.armor;
                 printf("The monster attacked you!\n");
@@ -623,7 +623,7 @@ void Combat()
                     printf("The monster dealt \033[0;31m0 damage\033[0m to you!\n");
                 }
             }
-            else if (chance == 2)
+            else if (chance >=46 && chance<=90)
             {
                 printf("The monster licked it's wounds!\n");
                 int hpgain = rand() % (monster.maxhp / 2);
@@ -634,7 +634,7 @@ void Combat()
                 }
                 printf("The monster \033[0;32mhealed %d hp\033[0m!\n", hpgain);
             }
-            else if (chance == 3)
+            else if (chance >=91 && chance<=100)
             {
                 printf("The monster is checking you out...\n");
                 printf("It doesn't seem to be attacking!\n");
@@ -793,7 +793,7 @@ void levelUp()
     {
 
         Pscale = Pscale + 0.1;
-        Escale = Escale + 0.2;
+        Escale = Escale + 0.3;
 
         self.lvl++;
         self.exp = 0;
