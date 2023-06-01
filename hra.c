@@ -616,7 +616,7 @@ void Combat()
         {
             srand(time(NULL));
             int chance = rand() % (100 - 1 + 1) + 1;
-            if (chance >= 1 && chance <= 45)
+            if (chance >= 1 && chance <= 60)
             {
                 monster.totaldmg = (monster.dmg + rand() % 16 + 0) - block - self.armor;
                 printf("The monster attacked you!\n");
@@ -630,7 +630,7 @@ void Combat()
                     printf("The monster dealt \033[0;31m0 damage\033[0m to you!\n");
                 }
             }
-            else if (chance >= 46 && chance <= 90)
+            else if (chance >= 61 && chance <= 90)
             {
                 printf("The monster licked it's wounds!\n");
                 int hpgain = rand() % (monster.maxhp / 2);
@@ -1075,7 +1075,7 @@ void MoveUpdate()
 void shop()
 {
     int koupe = 1;
-
+    
     printf("Welcome to shop \n");
     Sleep(500);
     printf("This is what we offer\n\n");
@@ -1084,6 +1084,7 @@ void shop()
     int totalOptions = 17;
     do
     {
+
         int cursorPosition = 1;
         while (1)
         {
@@ -1189,6 +1190,7 @@ void shop()
             if (self.gold >= 30)
             {
                 self.gold = self.gold - 30;
+                system("cls");
                 printf("you spent \033[0;33m30 gold\033[0m on health potion \n");
                 UpdateItemNumber("health potion");
                 Sleep(1200);
@@ -1196,6 +1198,7 @@ void shop()
             }
             else
             {
+                system("cls");
                 printf("you are too poor :( \n");
                 Sleep(1200);
                 system("cls");
@@ -1208,6 +1211,7 @@ void shop()
             {
                 self.gold = self.gold - 30;
                 printf("\n");
+                system("cls");
                 printf("you spent \033[0;33m30 gold\033[0m on mana potion \n");
                 UpdateItemNumber("mana potion");
                 Sleep(1200);
@@ -1216,6 +1220,7 @@ void shop()
             else
             {
                 printf("\n");
+                system("cls");
                 printf("you are too poor :( \n");
                 Sleep(1200);
                 system("cls");
@@ -1528,6 +1533,7 @@ void UpdateEquipment(int input)
                 return;
             }
             self.gold -= price;
+            system("cls");
             printf("you bought %s %s for \033[0;33m%d gold\033[0m \n", name, tool, price);
             Sleep(1500);
             if (strcmp(tool, "armor") == 0)
