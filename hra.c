@@ -54,6 +54,8 @@ struct stats
 
 void Welcome()
 {
+    Generate_map();
+    StartPlayer();
     int option = 1;
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(hConsole, 12);
@@ -151,7 +153,7 @@ void Welcome()
                 }
                 else
                 {
-                    printf("\033[0m");
+                    printf("\033[0;97m");
                 }
                 printf("%d. %s: %.1f\n", i + 1, scores[i].name, scores[i].score);
             }
@@ -284,7 +286,7 @@ void Menu()
                 printf("\033[0;31mYour damage: %d\n", self.dmg + self.weapondmg);
                 printf("\033[0;35mYour level: %d\n", self.lvl);
                 printf("\033[0;35mYour exp: %d/%d\n", self.exp, self.maxexp);
-                printf("\033[0;33mYour gold: %d\033[0m\n", self.gold);
+                printf("\033[0;33mYour gold: %d\033[0;97m\n", self.gold);
                 system("pause");
                 system("cls");
                 int invalid = 0;
@@ -401,7 +403,7 @@ void Combat()
     {
         fwrite(buffer, sizeof(char), bytesRead, stdout);
     }
-    printf("\033[0m");
+    printf("\033[0;97m");
     fclose(file);
     free(nameWithoutExtension);
     free(filePath);
@@ -412,17 +414,21 @@ void Combat()
         while (1)
         {
             printf("\033[0;33m");
+            if (boss % 5 == 0 && boss != 0)
+            {
+                printf("\033[0;31m");
+            }
             printf("-----------------------------------------------------------------\n");
             printf("\t\t\tENEMY STATS\t\t\t\t|\n");
             printf("-----------------------------------------------------------------\n");
-            printf("\033[0m");
-            printf("\t\033[0;32mHP: %d/%d\033[0m\n", monster.hp, monster.maxhp);
+            printf("\033[0;97m");
+            printf("\t\033[0;32mHP: %d/%d\033[0;97m\n", monster.hp, monster.maxhp);
             printf("\033[0;33m");
             printf("-----------------------------------------------------------------\n");
             printf("\t\t\tYOUR STATS\t\t\t\t|\n");
             printf("-----------------------------------------------------------------\n");
-            printf("\033[0m");
-            printf("\t\033[0;32mHP: %d/%d\t\033[0;34mMANA: %d/%d\t\033[0;90mARMOR: %d\t\033[0;31mDMG: %d\033[0m\n", self.hp, self.maxhp, self.mana, self.maxmana, self.armor, self.dmg + self.weapondmg);
+            printf("\033[0;97m");
+            printf("\t\033[0;32mHP: %d/%d\t\033[0;34mMANA: %d/%d\t\033[0;90mARMOR: %d\t\033[0;31mDMG: %d\033[0;97m\n", self.hp, self.maxhp, self.mana, self.maxmana, self.armor, self.dmg + self.weapondmg);
             printf("\nWhat do you want to do?\n");
             printf("-Attack%s\n", (option == 1 ? " <--" : ""));
             printf("-Skills%s\n", (option == 2 ? " <--" : ""));
@@ -461,7 +467,7 @@ void Combat()
         case 1:
         {
             printf("You chose to attack!\n");
-            printf("You dealt \033[0;31m%d damage\033[0m to the monster!\n", self.totaldmg);
+            printf("You dealt \033[0;31m%d damage\033[0;97m to the monster!\n", self.totaldmg);
             monster.hp -= self.totaldmg;
             system("pause");
             printf("\033[3A");
@@ -493,7 +499,7 @@ void Combat()
                 for (int i = 0; i < numSkills; i++)
                 {
                     printf("%d. Skill Name: %s\n", i + 1, skills[i].skillname);
-                    printf("   \033[0;34mMana Cost: %d\033[0m\n", skills[i].manacost);
+                    printf("   \033[0;34mMana Cost: %d\033[0;97m\n", skills[i].manacost);
                     printf("   Value: %d\n", skills[i].value);
                     printf("   Type: %s\n", skills[i].type);
                     printf("\n");
@@ -511,7 +517,10 @@ void Combat()
                     if (self.mana < chosenSkill.manacost)
                     {
                         printf("The skill didn't work!\n");
-                        printf("You don't have enough \033[0;34mmana\033[0m!\n");
+                        printf("You don't have enough \033[0;34mmana\033[0;97m!\n");
+                        system("pause");
+                        printf("\033[%dA", (numSkills * 5) + 4);
+                        printf("\033[0J");
                         break;
                     }
                     printf("\033[%dA", (numSkills * 5) + 1);
@@ -519,17 +528,17 @@ void Combat()
                     printf("%s!\n", chosenSkill.skillname);
                     if (strcmp(chosenSkill.type, "damage") == 0)
                     {
-                        printf("You dealt \033[0;31m%d damage\033[0m to the monster!\n", self.totaldmg + chosenSkill.value);
+                        printf("You dealt \033[0;31m%d damage\033[0;97m to the monster!\n", self.totaldmg + chosenSkill.value);
                         monster.hp -= self.totaldmg + chosenSkill.value;
                     }
                     else if (strcmp(chosenSkill.type, "defense") == 0)
                     {
-                        printf("You are blocking \033[0;31m%d of damage\033[0m!\n", chosenSkill.value);
+                        printf("You are blocking \033[0;31m%d of damage\033[0;97m!\n", chosenSkill.value);
                         self.defense = chosenSkill.value;
                     }
                     else if (strcmp(chosenSkill.type, "heal") == 0)
                     {
-                        printf("You healed yourself for \033[0;32m%d hp\033[0m!\n", chosenSkill.value);
+                        printf("You healed yourself for \033[0;32m%d hp\033[0;97m!\n", chosenSkill.value);
                         self.hp += chosenSkill.value;
                         if (self.hp > self.maxhp)
                         {
@@ -538,7 +547,7 @@ void Combat()
                     }
                     else if (strcmp(chosenSkill.type, "instakill") == 0)
                     {
-                        printf("\033[0;31mYou decimated the monster with %d dmg!\033[0m\n", chosenSkill.value + self.totaldmg);
+                        printf("\033[0;31mYou decimated the monster with %d dmg!\033[0;97m\n", chosenSkill.value + self.totaldmg);
                         monster.hp -= self.totaldmg + chosenSkill.value;
                     }
                     else if (strcmp(chosenSkill.type, "escape") == 0)
@@ -581,7 +590,7 @@ void Combat()
         {
             printf("You chose to defend!\n");
             int block = self.defense + rand() % 6 + 5;
-            printf("You are blocking \033[0;31m%d of damage!\033[0m\n", block);
+            printf("You are blocking \033[0;31m%d of damage!\033[0;97m\n", block);
             system("pause");
             printf("\033[3A");
             printf("\033[0J");
@@ -622,12 +631,12 @@ void Combat()
                 printf("The monster attacked you!\n");
                 if (monster.totaldmg >= 0)
                 {
-                    printf("The monster dealt \033[0;31m%d damage\033[0m to you!\n", monster.totaldmg);
+                    printf("The monster dealt \033[0;31m%d damage\033[0;97m to you!\n", monster.totaldmg);
                     self.hp -= monster.totaldmg;
                 }
                 else
                 {
-                    printf("The monster dealt \033[0;31m0 damage\033[0m to you!\n");
+                    printf("The monster dealt \033[0;31m0 damage\033[0;97m to you!\n");
                 }
             }
             else if (chance >= 61 && chance <= 90)
@@ -639,7 +648,7 @@ void Combat()
                 {
                     monster.hp = monster.maxhp;
                 }
-                printf("The monster \033[0;32mhealed %d hp\033[0m!\n", hpgain);
+                printf("The monster \033[0;32mhealed %d hp\033[0;97m!\n", hpgain);
             }
             else if (chance >= 91 && chance <= 100)
             {
@@ -670,7 +679,7 @@ void Combat()
     {
         system("cls");
         printf("You have defeated the monster!\n");
-        printf("You gained \033[0;33m%d gold\033[0m and \033[0;35m%d exp!\033[0m\n", monster.gold, monster.exp);
+        printf("You gained \033[0;33m%d gold\033[0;97m and \033[0;35m%d exp!\033[0;97m\n", monster.gold, monster.exp);
         self.gold += monster.gold;
         self.exp += monster.exp;
         self.totalgold += self.gold;
@@ -744,7 +753,7 @@ void printRandomSkills()
     {
         int index = selectedSkills[i];
         printf("%d. Skill Name: %s\n", i + 1, skills[index].skillname);
-        printf("   \033[0;34mMana Cost: %d\033[0m\n", skills[index].manacost);
+        printf("   \033[0;34mMana Cost: %d\033[0;97m\n", skills[index].manacost);
         printf("   Value: %d\n", skills[index].value);
         printf("   Type: %s\n", skills[index].type);
         printf("\n");
@@ -812,7 +821,7 @@ void levelUp()
         printf("\033[0;35mYou are now level %d!\n", self.lvl);
         printf("\033[0;31mYou gained bigger max HP!\n");
         printf("\033[0;34mYou gained 10 max mana!\n");
-        printf("\033[0;90mYou gained bigger damage!\033[0m\n");
+        printf("\033[0;90mYou gained bigger damage!\033[0;97m\n");
 
         if (self.lvl % 3 == 0)
         {
@@ -855,8 +864,8 @@ void End()
     {
         system("cls");
         printf("It's Game Over for %s!\n", nickname);
-        printf("\033[0;35mYou reached level %d\033[0m!\n", self.lvl);
-        printf("You gained a total of \033[0;35m%d exp\033[0m and \033[0;33m%d gold!\033[0m\n", self.totalexp, self.totalgold);
+        printf("\033[0;35mYou reached level %d\033[0;97m!\n", self.lvl);
+        printf("You gained a total of \033[0;35m%d exp\033[0;97m and \033[0;33m%d gold!\033[0;97m\n", self.totalexp, self.totalgold);
         printf("Thank you for playing!\n");
         system("pause");
         CreateScore();
@@ -938,7 +947,7 @@ void Print_map()
 {
 
     SetCursorPosition(0, 0);
-    printf("\033[0;31mX -> You\t\033[0;32mT -> Forest\t\033[0;34mO -> Water\t\033[0;37mM -> Mountains\t\033[0;33m- -> Plains\033[0m\n\n");
+    printf("\033[0;31mX -> You\t\033[0;32mT -> Forest\t\033[0;34mO -> Water\t\033[0;97mM -> Mountains\t\033[0;33m- -> Plains\033[0;97m\n\n");
     for (i = 0; i < SIZE_Y; i++)
     {
         for (j = 0; j < SIZE_X; j++)
@@ -957,7 +966,7 @@ void Print_map()
             }
             else if (map[i][j][0] == 4 && map[i][j][1] == 0)
             {
-                printf("\033[0;37mM ");
+                printf("\033[0;97mM ");
             }
             else if (map[i][j][1] == 1)
             {
@@ -967,7 +976,7 @@ void Print_map()
 
         printf("\n");
     }
-    printf("\033[0m");
+    printf("\033[0;97m");
     printf("Controls: w, a, s, d\n");
     printf("Press q to quit\n");
 }
@@ -1022,7 +1031,7 @@ void MoveUpdate()
         {
             printf("\nA monster attacked you!\n");
         }
-        printf("\033[0m");
+        printf("\033[0;97m");
         Sleep(2000);
         system("cls");
         Combat();
@@ -1045,7 +1054,7 @@ void MoveUpdate()
         }
         printf("You gained %d HP!\n", hpgain);
         printf("You gained %d MANA!\n", managain);
-        printf("\033[0m");
+        printf("\033[0;97m");
         Sleep(2000);
         printf("\033[3A");
         printf("\033[0J");
@@ -1057,7 +1066,7 @@ void MoveUpdate()
         printf("\nYou found a treasure chest!\n");
         int goldgain = rand() % 501 + 500;
         printf("You gained %d gold!", goldgain);
-        printf("\033[0m");
+        printf("\033[0;97m");
         self.gold += goldgain;
         Sleep(2000);
         printf("\033[2A");
@@ -1075,7 +1084,7 @@ void MoveUpdate()
 void shop()
 {
     int koupe = 1;
-    
+
     printf("Welcome to shop \n");
     Sleep(500);
     printf("This is what we offer\n\n");
@@ -1091,63 +1100,63 @@ void shop()
             system("cls");
             printf("POTIONS \n \n");
 
-            printf("1)\033[0;32m HEALTH POTION\033[0m - \033[0;33m30 gold\033[0m%s \n", (koupe == 1 ? " <--" : ""));
-            printf("\033[0;90mgives you 25 hp\033[0m \n\n");
+            printf("1)\033[0;32m HEALTH POTION\033[0;97m - \033[0;33m30 gold\033[0;97m%s \n", (koupe == 1 ? " <--" : ""));
+            printf("\033[0;90mgives you 25 hp\033[0;97m \n\n");
 
-            printf("2) \033[0;36mMANA POTION\033[0m - \033[0;33m30 gold\033[0m%s \n", (koupe == 2 ? " <--" : ""));
-            printf("\033[0;90mgives you 30 mana power\033[0m \n\n");
+            printf("2) \033[0;36mMANA POTION\033[0;97m - \033[0;33m30 gold\033[0;97m%s \n", (koupe == 2 ? " <--" : ""));
+            printf("\033[0;90mgives you 30 mana power\033[0;97m \n\n");
 
-            printf("\033[0;35mARMORS\033[0m \n \n");
+            printf("\033[0;35mARMORS\033[0;97m \n \n");
 
-            printf("3)\033[0;91m LEATHER ARMOR\033[0m - \033[0;33m150 gold\033[0m%s \n", (koupe == 3 ? " <--" : ""));
-            printf("\033[0;90mgives you 25 armor\033[0m \n\n");
+            printf("3)\033[0;91m LEATHER ARMOR\033[0;97m - \033[0;33m150 gold\033[0;97m%s \n", (koupe == 3 ? " <--" : ""));
+            printf("\033[0;90mgives you 25 armor\033[0;97m \n\n");
 
-            printf("4)\033[0;90m IRON ARMOR\033[0m - \033[0;33m300 gold\033[0m%s \n", (koupe == 4 ? " <--" : ""));
-            printf("\033[0;90mgives you 75 armor\033[0m \n\n");
+            printf("4)\033[0;90m IRON ARMOR\033[0;97m - \033[0;33m300 gold\033[0;97m%s \n", (koupe == 4 ? " <--" : ""));
+            printf("\033[0;90mgives you 75 armor\033[0;97m \n\n");
 
-            printf("5)\033[0;97m STEEL ARMOR\033[0m - \033[0;33m900 gold\033[0m%s \n", (koupe == 5 ? " <--" : ""));
-            printf("\033[0;90mgives you 150 armor\033[0m \n\n");
+            printf("5)\033[0;97m STEEL ARMOR\033[0;97m - \033[0;33m900 gold\033[0;97m%s \n", (koupe == 5 ? " <--" : ""));
+            printf("\033[0;90mgives you 150 armor\033[0;97m \n\n");
 
-            printf("6)\033[0;93m DRAGON ARMOR\033[0m - \033[0;33m1200 gold\033[0m%s \n", (koupe == 6 ? " <--" : ""));
-            printf("\033[0;90mgives you 200 armor\033[0m \n\n");
+            printf("6)\033[0;93m DRAGON ARMOR\033[0;97m - \033[0;33m1200 gold\033[0;97m%s \n", (koupe == 6 ? " <--" : ""));
+            printf("\033[0;90mgives you 200 armor\033[0;97m \n\n");
 
-            printf("7)\033[0;96m PLATINUM ARMOR\033[0m - \033[0;33m1700 gold\033[0m%s \n", (koupe == 7 ? " <--" : ""));
-            printf("\033[0;90mgives you 275 armor\033[0m \n\n");
+            printf("7)\033[0;96m PLATINUM ARMOR\033[0;97m - \033[0;33m1700 gold\033[0;97m%s \n", (koupe == 7 ? " <--" : ""));
+            printf("\033[0;90mgives you 275 armor\033[0;97m \n\n");
 
-            printf("\033[0;35mSHIELDS\033[0m \n \n");
+            printf("\033[0;35mSHIELDS\033[0;97m \n \n");
 
-            printf("8)\033[0;91m LEATHER SHIELD\033[0m - \033[0;33m150 gold\033[0m%s \n", (koupe == 8 ? " <--" : ""));
-            printf("\033[0;90mgives you 25 defense\033[0m \n\n");
+            printf("8)\033[0;91m LEATHER SHIELD\033[0;97m - \033[0;33m150 gold\033[0;97m%s \n", (koupe == 8 ? " <--" : ""));
+            printf("\033[0;90mgives you 25 defense\033[0;97m \n\n");
 
-            printf("9)\033[0;90m IRON SHIELD\033[0m - \033[0;33m300 gold\033[0m%s \n", (koupe == 9 ? " <--" : ""));
-            printf("\033[0;90mgives you 75 defense\033[0m \n\n");
+            printf("9)\033[0;90m IRON SHIELD\033[0;97m - \033[0;33m300 gold\033[0;97m%s \n", (koupe == 9 ? " <--" : ""));
+            printf("\033[0;90mgives you 75 defense\033[0;97m \n\n");
 
-            printf("10)\033[0;97m STEEL SHIELD\033[0m - \033[0;33m900 gold\033[0m%s \n", (koupe == 10 ? " <--" : ""));
-            printf("\033[0;90mgives you 150 defense\033[0m \n\n");
+            printf("10)\033[0;97m STEEL SHIELD\033[0;97m - \033[0;33m900 gold\033[0;97m%s \n", (koupe == 10 ? " <--" : ""));
+            printf("\033[0;90mgives you 150 defense\033[0;97m \n\n");
 
-            printf("11)\033[0;93m DRAGON SHIELD\033[0m - \033[0;33m1200 gold\033[0m%s \n", (koupe == 11 ? " <--" : ""));
-            printf("\033[0;90mgives you 200 defense\033[0m \n\n");
+            printf("11)\033[0;93m DRAGON SHIELD\033[0;97m - \033[0;33m1200 gold\033[0;97m%s \n", (koupe == 11 ? " <--" : ""));
+            printf("\033[0;90mgives you 200 defense\033[0;97m \n\n");
 
-            printf("12)\033[0;96m PLATINUM SHIELD\033[0m - \033[0;33m1700 gold\033[0m%s \n", (koupe == 12 ? " <--" : ""));
-            printf("\033[0;90mgives you 275 defense\033[0m \n\n");
+            printf("12)\033[0;96m PLATINUM SHIELD\033[0;97m - \033[0;33m1700 gold\033[0;97m%s \n", (koupe == 12 ? " <--" : ""));
+            printf("\033[0;90mgives you 275 defense\033[0;97m \n\n");
 
-            printf("\033[0;35mWEAPONS\033[0m \n \n");
+            printf("\033[0;35mWEAPONS\033[0;97m \n \n");
 
-            printf("13)\033[0;91m WOODEN SWORD\033[0m - \033[0;33m150 gold\033[0m%s \n", (koupe == 13 ? " <--" : ""));
-            printf("\033[0;90mgives you 15 damage\033[0m \n\n");
+            printf("13)\033[0;91m WOODEN SWORD\033[0;97m - \033[0;33m150 gold\033[0;97m%s \n", (koupe == 13 ? " <--" : ""));
+            printf("\033[0;90mgives you 15 damage\033[0;97m \n\n");
 
-            printf("14)\033[0;90m IRON SWORD\033[0m - \033[0;33m300 gold\033[0m%s \n", (koupe == 14 ? " <--" : ""));
-            printf("\033[0;90mgives you 25 damage\033[0m \n\n");
+            printf("14)\033[0;90m IRON SWORD\033[0;97m - \033[0;33m300 gold\033[0;97m%s \n", (koupe == 14 ? " <--" : ""));
+            printf("\033[0;90mgives you 25 damage\033[0;97m \n\n");
 
-            printf("15)\033[0;97m STEEL SWORD\033[0m - \033[0;33m900 gold\033[0m%s \n", (koupe == 15 ? " <--" : ""));
-            printf("\033[0;90mgives you 50 damage\033[0m \n\n");
+            printf("15)\033[0;97m STEEL SWORD\033[0;97m - \033[0;33m900 gold\033[0;97m%s \n", (koupe == 15 ? " <--" : ""));
+            printf("\033[0;90mgives you 50 damage\033[0;97m \n\n");
 
-            printf("16)\033[0;93m DRAGON SWORD\033[0m - \033[0;33m1200 gold\033[0m%s \n", (koupe == 16 ? " <--" : ""));
-            printf("\033[0;90mgives you 70 damage\033[0m \n\n");
+            printf("16)\033[0;93m DRAGON SWORD\033[0;97m - \033[0;33m1200 gold\033[0;97m%s \n", (koupe == 16 ? " <--" : ""));
+            printf("\033[0;90mgives you 70 damage\033[0;97m \n\n");
 
-            printf("17)\033[0;96m PLATINUM SWORD\033[0m - \033[0;33m1700 gold\033[0m%s \n", (koupe == 17 ? " <--" : ""));
-            printf("\033[0;90mgives you 100 damage\033[0m \n\n");
-            printf("\033[0;33mYou have %d gold\033[0m \n", self.gold);
+            printf("17)\033[0;96m PLATINUM SWORD\033[0;97m - \033[0;33m1700 gold\033[0;97m%s \n", (koupe == 17 ? " <--" : ""));
+            printf("\033[0;90mgives you 100 damage\033[0;97m \n\n");
+            printf("\033[0;33mYou have %d gold\033[0;97m \n", self.gold);
             printf("Choose what you want to buy or press q to quit \n");
             COORD newPosition;
             newPosition.X = 0;
@@ -1191,7 +1200,7 @@ void shop()
             {
                 self.gold = self.gold - 30;
                 system("cls");
-                printf("you spent \033[0;33m30 gold\033[0m on health potion \n");
+                printf("you spent \033[0;33m30 gold\033[0;97m on health potion \n");
                 UpdateItemNumber("health potion");
                 Sleep(1200);
                 system("cls");
@@ -1212,7 +1221,7 @@ void shop()
                 self.gold = self.gold - 30;
                 printf("\n");
                 system("cls");
-                printf("you spent \033[0;33m30 gold\033[0m on mana potion \n");
+                printf("you spent \033[0;33m30 gold\033[0;97m on mana potion \n");
                 UpdateItemNumber("mana potion");
                 Sleep(1200);
                 system("cls");
@@ -1363,7 +1372,7 @@ void UsePotion(int *invalid)
         printf("%d / %d HP \n", self.hp, self.maxhp);
         printf("\033[0;34m");
         printf("%d / %d MANA \n\n", self.mana, self.maxmana);
-        printf("\033[0m");
+        printf("\033[0;97m");
         printf("press q to leave \n");
         input = getch();
 
@@ -1433,7 +1442,7 @@ int DecreaseItemCount(char input, int *mpotion, int *hpotion)
             {
                 *hpotion = 1;
                 printf("\n");
-                printf("you drunk health potion and got \033[0;32m25 HP\033[0m \n");
+                printf("you drunk health potion and got \033[0;32m25 HP\033[0;97m \n");
                 Sleep(1100);
                 self.hp = self.hp + 25;
                 if (self.hp > self.maxhp)
@@ -1445,7 +1454,7 @@ int DecreaseItemCount(char input, int *mpotion, int *hpotion)
             {
                 *mpotion = 1;
                 printf("\n");
-                printf("you drunk health potion and got \033[0;34m30 mana power\033[0m \n");
+                printf("you drunk health potion and got \033[0;34m30 mana power\033[0;97m \n");
                 Sleep(1100);
                 self.mana = self.mana + 30;
                 if (self.mana > self.maxmana)
@@ -1534,7 +1543,7 @@ void UpdateEquipment(int input)
             }
             self.gold -= price;
             system("cls");
-            printf("you bought %s %s for \033[0;33m%d gold\033[0m \n", name, tool, price);
+            printf("you bought %s %s for \033[0;33m%d gold\033[0;97m \n", name, tool, price);
             Sleep(1500);
             if (strcmp(tool, "armor") == 0)
             {
